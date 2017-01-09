@@ -8,9 +8,9 @@
 
 import java.nio.file.Path
 import java.nio.file.Files
-import java.io.{File, FileInputStream, IOException}
 import java.time.LocalDate
 import java.util.Scanner
+import java.io._              // I can probably delete all other io imports.
 
 import scala.io.Source
 import scala.collection.immutable.{TreeMap, TreeSet}
@@ -54,6 +54,8 @@ class BigBrainSecurity {
     val dirSet = getNewArrayOfDirectories(fileList).toSet // Converts array to a set
 
     val fileTreeSet = collection.immutable.TreeSet[String]() ++ fileSet  // Converts the set of files into a TreeSet.
+    val fileTreeMap = TreeMap[String, String]
+
     fileTreeSet.foreach(println) // THIS IS A TEST
 
     /***********************CALL METHOD TO POPULATE TreeSet WITH SecureFile OBJECT******************************
@@ -70,14 +72,9 @@ class BigBrainSecurity {
   }
 /*******************************************END MAIN METHOD************************************************************/
 
-         /*******************************CONVERT TO TREE MAPS******************************************/
-  private def storeNewFilesToTreeMap(): collection.immutable.TreeMap[String, File] ={
-    // this TreeMap would consist of the filename as a key and a file object value
-  } // END convertNewFilesToTreeMap
-
+  /******************************************STORE IN TREE*************************************************************/
   /** I have a feeling it will be a lot faster to take care of File i/o w/ a stream */
   // probably need to set up TreeSet using Ordering.fromLessThan[String](_>_). Example page 22.
-
   /*
    * When this method is called, the param needs to call .toList() to convert array to list.
    * Lists are fast when calling the .head()
@@ -94,6 +91,14 @@ class BigBrainSecurity {
       else loop(fileSet.tail, accTreeSet.insert( makeHash(new File(fileSet.head) )))
     } // END loop()
   loop( fileSet, new TreeSet[String]() )
+  } // END storeHashValuesInTree()
+
+  def storeHashValuesInTreeMap(fileSet: List[String]): TreeMap[String, String] = {
+    def loop(fileSet: List[String], accTreeMap: TreeMap[String, String]): TreeMap[String, String] = {
+      if (fileSet.isEmpty) accTreeMap
+      else loop(fileSet.tail, accTreeMap.insert( fileSet.head, makeHash(new File(fileSet.head) )))
+    } // END loop()
+    loop( fileSet, new TreeMap[String, String]() )
   } // END storeHashValuesInTree()
 
   /*
@@ -210,13 +215,18 @@ class BigBrainSecurity {
           *         not running. They will all be overriden by sub classes.                       *
           ******************************************************************************************/
 
-    def prepFile(): Unit = {}                                                                    // END prepFile()
-    def doWork(setOfStrings: Set[String] ): Unit = {/*Method to convert a given set to */}       // END doWork()
-    def closeFile(): Unit = {}                                                                    // END closeFile()
+  /*******Function takes a single String and writes it to a file that is generated based on the fileTreeMap***********/
+  def writeToTxtFile(txt: String): Unit ={
+    val file = new File( generateTxtFileName(generateTxtFileName(fileTreeMap)) ) // Create a file where we'll store hash values.
+    val bw = new BufferedWriter(new FileWriter(file))
+    bw.write(txt)
+    bw.close()
+  } // END writeToTxtFile()
 
 /*********************************Method reads txt file and converts it into a String**********************************/
     def readTxtFromFile(filename: String): String = {
-      return Source.fromFile(filename).getLines.mkString
+      Source.fromFile(filename).getLines.mkString   // read all of the lines from the file as one String.
+      // this technique does not close the file.
     } // END readTxtFromFile()
 
 } // END BigBrainSecurity class
