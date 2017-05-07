@@ -1,5 +1,5 @@
 /**
-  * (@)Author: Alex Moorman
+  * (@)Author: glassCodeBender
   * (#)Version: 1.0
   * (#)Date: 12/25/2016
   *
