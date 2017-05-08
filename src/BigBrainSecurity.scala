@@ -1,5 +1,5 @@
 /**
-  * ALERT: This section of the program has been moved to IntegrityCheck.scala. I wrote this program a long time ago
+  * ALERT: This section has been moved to IntegrityCheck.scala. I wrote this program a long time ago
   * before I knew a lot about fully understood data structures. Eventually, after I complete IntegrityCheck.scala, this
   * program will be a subclass of IntegrityCheck.scala. BigBrainSecurity will be used to access a forensics program I'm 
   * writing in python based on the Volatility framework, to generate a report of the findings, and to access the config 
