@@ -11,17 +11,18 @@
 	*
 	*/
 
-import java.nio.file.Path
-import java.nio.file.Files
-// import java.time.LocalDate
-import java.util.Scanner
-import java.io._
 // import java.util
+// import java.time.LocalDate
+// import java.nio.file.Path
+// import java.nio.file.Files
+// import java.util.Scanner
+import java.io._
 
 import scala.collection.mutable
 import scala.io.Source
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
+
 import org.apache.commons.codec.digest
 
 class IntegrityCheck {
