@@ -13,10 +13,10 @@
 
 import java.nio.file.Path
 import java.nio.file.Files
-import java.time.LocalDate
+// import java.time.LocalDate
 import java.util.Scanner
 import java.io._
-import java.util
+// import java.util
 
 import scala.collection.mutable
 import scala.io.Source
@@ -134,14 +134,14 @@ class IntegrityCheck {
 				val digest = DigestUtils.sha1Hex(inputStream)             // this should not be sha1Hex()
 				// System.out.println("Digest          = " + digest)
 				// System.out.println("Digest.length() = " + digest.length)
-				return digest.toString
+				return digest.toString()
 			}
 			catch {
 				case e: IOException => {
 					// print message
 					e.printStackTrace()
 				}
-			} // END catch
+			} // END try/catch
 		} // END inputStreamDigest()
 		inputStreamDigest()
 	} // END makeHash()
