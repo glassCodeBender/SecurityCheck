@@ -39,12 +39,9 @@ import java.io.{File, FileInputStream}
 class IntegrityCheck {
 
 	/***********************************************CLASS CONSTRUCTOR******************************************************/
-	private class IntegrityCheck( val inDirectory: String = "C:\\Users\\", val outDirectory: String = null ) {
-		def rootDirectory: String = inDirectory
-		def destDirectory: String = outDirectory
-
-	} // END constructor
-
+	val inDirectory: String = "C:\\Users\\"
+	val outDirectory: String = null 
+	
 	/*************************************************MAIN METHOD********************************************************/
 	def main(args: Array[String]): Unit = {
 
@@ -185,7 +182,6 @@ class IntegrityCheck {
 
 		fileBytes = java.nio.file.Files.readAllByte(fileName)
 		KeyHasher.FNV1_32.hashKey(fileBytes) // this is a test. The algorithm was not chosen yet.
-
 	}
 
 /*
