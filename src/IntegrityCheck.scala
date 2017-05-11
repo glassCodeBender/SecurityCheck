@@ -1,8 +1,5 @@
 package com.BigBrainSecurity
 
-
-
-
 /**
 	* (@)Author: glassCodeBender
 	* (#)Version: 1.0
@@ -21,7 +18,7 @@ package com.BigBrainSecurity
 // import java.nio.file.Path
 // import java.nio.file.Files
 // import java.util.Scanner
-import java.io._
+// import java.io._
 import java.nio.file.{Files, Path, Paths}
 
 import scala.collection.mutable
@@ -103,7 +100,7 @@ class IntegrityCheck {
 	def genHashMap(fileSet: List[String]): mutable.HashMap[String, String] = {
 		def loop(fileSet: List[String], accHashList: mutable.HashMap[String, String]): mutable.HashMap[String, String] = {
 			if (fileSet.isEmpty) accHashList
-			else loop(fileSet.tail, accHashList += (fileSet.head -> makeHash( new File(fileSet.head) )))
+			else loop(fileSet.tail, accHashList += (fileSet.head -> makeHash( fileSet.head ) )))
 		} // END loop()
 		loop( fileSet, new mutable.HashMap[String, String]() )
 	} // END genHashMap()
@@ -113,7 +110,7 @@ class IntegrityCheck {
 	def genTreeMap(fileSet: List[String]): mutable.TreeMap[String, String] = {
 		def loop(fileSet: List[String], accHashList: mutable.TreeMap[String, String]): mutable.TreeMap[String, String] = {
 			if (fileSet.isEmpty) accHashList
-			else loop(fileSet.tail, accHashList += (fileSet.head -> makeHash( new File(fileSet.head) )))
+			else loop(fileSet.tail, accHashList += (fileSet.head -> makeHash( fileSet.head ) )))
 		} // END loop()
 		loop( fileSet, new mutable.TreeMap[String, String]() )
 	} // END genHashMap()
@@ -185,12 +182,9 @@ class IntegrityCheck {
 	} // END makeHash
 
 	private def makeTwitterHash( fileName: File ): String = {
-		fullName = new Paths.toAbsolutePath( fileName )
-		file = new Files()
-		
 
-
-		fileBytes = java.nio.file.Files.readAllByte(System.fileName)
+		fileBytes = java.nio.file.Files.readAllByte(fileName)
+		KeyHasher.FNV1_32.hashKey(fileBytes) // this is a test. The algorithm was not chosen yet.
 
 	}
 
