@@ -28,7 +28,7 @@ import com.twitter.hashing
 import java.security.MessageDigest
 
 import com.twitter.hashing.KeyHasher
-import java.guava-com.google.common.hash
+import com.google.common.hash
 
 import java.security.{MessageDigest, DigestInputStream}
 import java.io.{File, FileInputStream}
