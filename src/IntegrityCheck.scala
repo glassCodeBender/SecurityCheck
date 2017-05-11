@@ -1,3 +1,8 @@
+package com.BigBrainSecurity
+
+
+
+
 /**
 	* (@)Author: glassCodeBender
 	* (#)Version: 1.0
@@ -17,13 +22,22 @@
 // import java.nio.file.Files
 // import java.util.Scanner
 import java.io._
+import java.nio.file.{Files, Path, Paths}
 
 import scala.collection.mutable
 import scala.io.Source
 import scala.collection.mutable.Map
 import scala.collection.mutable.ListBuffer
+import java.org.apache.commons.codec.digest
 
-import org.apache.commons.codec.digest
+import com.twitter.hashing
+import java.security.MessageDigest
+
+import com.twitter.hashing.KeyHasher
+import java.guava-com.google.common.hash
+
+import java.security.{MessageDigest, DigestInputStream}
+import java.io.{File, FileInputStream}
 
 class IntegrityCheck {
 
@@ -72,7 +86,7 @@ class IntegrityCheck {
 		/* REMEMBER: If you have to loop through a collection, you are probably doing something wrong. */
 		// var boolHashMap = new mutable.HashMap[String, Boolean]
 		// newTreeMap.keys.foreach( (fileName) =>
-			// if ( oldHashMap.contains(fileName) ) boolHashMap += (newTreeMap.keys -> oldHashMap._ == newHashMap._ )
+		// if ( oldHashMap.contains(fileName) ) boolHashMap += (newTreeMap.keys -> oldHashMap._ == newHashMap._ )
 
 		/* Import BigBrainSecurity config file and check the file's checksum to ensure integrity. */
 
@@ -110,7 +124,7 @@ class IntegrityCheck {
 	def getSubDirList(directoryName: String): List[String] = {
 		return (new File(directoryName)).listFiles.filter(_.isDirectory).map(_.getName ).toList
 	}
-  // I'm removing the filter so that this method will get a list of all directories and files.
+	// I'm removing the filter so that this method will get a list of all directories and files.
 	def getFileList(dirName: String): List[String] = {
 		return (new File(dirName)).listFiles.map(_.getAbsolutePath).toList
 	}
@@ -120,19 +134,95 @@ class IntegrityCheck {
 	}
 
 	/*****************************************CONVERTS A FILE TO A HASH VALUE**********************************************/
+	/*Building
+
+	Use sbt (simple-build-tool) to build:
+
+		$ sbt clean update package-dist
+	The finished jar will be in dist/.
+
+	Using
+
+	To use hash functions:
+
+	KeyHasher.FNV1_32.hashKey("string".getBytes)
+
+	Available hash functions are:
+
+	FNV1_32
+	FNV1A_32
+	FNV1_64
+	FNV1A_64
+	KETAMA
+	CRC32_ITU
+	HSIEH
+	To use ketama distributor:
+
+	val nodes = List(KetamaNode("host:port", weight, client))
+	val distributor = new KetamaDistributor(nodes, KeyHasher.FNV1_32)
+	distributor.nodeForKey("abc") // => client
+	*/
+
 	private def makeHash( fileName: File ): String = {
+
+		try {
+			val buffer = new Array[Byte](8192)
+			val md5 = MessageDigest.getInstance("MD5")
+
+			val dis = new DigestInputStream(new FileInputStream( new Files(fileName) ), md5)
+			try { while (dis.read(buffer) != -1) { } } finally { dis.close() }
+
+			md5.digest.map("%02x".format(_)).mkString
+		}
+		catch {
+			case e: IOException => {
+				// print message
+				e.printStackTrace()
+			}
+		} // END try/catch
+
+
+	} // END makeHash
+
+	private def makeTwitterHash( fileName: File ): String = {
+		fullName = new Paths.toAbsolutePath( fileName )
+		file = new Files()
+		
+
+
+		fileBytes = java.nio.file.Files.readAllByte(System.fileName)
+
+	}
+
+/*
+	private def makeGoogleHash( fileName: File): String = {
+		try {
+			return new com.google.common.hash.Hasher.putObject(fileName)
+		}
+		catch {
+			case e: IOException => {
+				// print message
+				e.printStackTrace()
+			}
+		} // END try/catch
+	} // END makeGoogleHash()
+
+  // KeyHasher.FNV1_32.hashKey(Byte[])
+
+	private def makeHash2(fileName: File): String = {
 		/**
-			* Calculates SHA-1 digest of InputStream object.
-			*
-			* Research how to import java programs into scala.
+			* Using Twitter's util API to hash functions.
 			*/
+
 		private def inputStreamDigest() { /*Method below was changed from getAbsoluteFile() */
 			val data = System.getProperty( fileName.getAbsolutePath )   // See System API, method requires 2 params.
 			val file = new File(data)
 
 			try {
 				val inputStream = new FileInputStream( fileName )
-				val digest = DigestUtils.sha1Hex(inputStream)             // this should not be sha1Hex()
+				val digest = {
+					DigestUtils.sha256Hex( inputStream )
+				} // this should not be sha1Hex()
 				// System.out.println("Digest          = " + digest)
 				// System.out.println("Digest.length() = " + digest.length)
 				return digest.toString()
@@ -146,4 +236,6 @@ class IntegrityCheck {
 		} // END inputStreamDigest()
 		inputStreamDigest()
 	} // END makeHash()
+	*/
+
 } // END IntegrityCheck class
