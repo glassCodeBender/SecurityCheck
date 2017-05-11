@@ -3,28 +3,25 @@ package com.BigBrainSecurity
 /**
 	* (@)Author: glassCodeBender
 	* (#)Version: 1.0
-	* (#)Date: 5/8/2017
+	* (#)Date: 5/11/2017
 	*
 	* PROGRAM PURPOSE: To test critical files and see if changes have been made.
 	*
-	* IntegrityCheck.scala is a super class of BigBrainSecurity.scala. This program will be the workhorse behind
-	* BigBrainSecurity's IDS system. BigBrainSecurity.scala, along with the forensic program I'm writing in python
-	* that BigBrainSecurity will call, will do most of the "thinking".
+	* IntegrityCheck.scala is a super class of BigBrainSecurity.scala. This program will be the workhorse behind the file
+	* swap section of BigBrainSecurity's IDS system. BigBrainSecurity.scala, along with the forensic program I'm writing 
+	in python will do most of the "thinking".
 	*
 	*/
 
-// import java.util
-// import java.time.LocalDate
-// import java.nio.file.Path
-// import java.nio.file.Files
-// import java.util.Scanner
-// import java.io._
-import java.nio.file.{Files, Path, Paths}
+import java.util
+import java.time.LocalDate
+import java.nio.file.Files
+import java.util.Scanner
+import java.io.IOException
+import java.io.File
 
 import scala.collection.mutable
 import scala.io.Source
-import scala.collection.mutable.Map
-import scala.collection.mutable.ListBuffer
 import java.org.apache.commons.codec.digest
 
 import com.twitter.hashing
@@ -39,18 +36,16 @@ import java.io.{File, FileInputStream}
 object IntegrityCheck {
 
 	/***********************************************CLASS CONSTRUCTOR******************************************************/
-	val inDirectory: String = "C:\\Users\\"
-	val outDirectory: String = null 
-	
+	val inDirectory: String = "C:\\Users\\" // stores root directory
+	val outDirectory: String = null
+
 	/*************************************************MAIN METHOD********************************************************/
 	def main(args: Array[String]): Unit = {
-
-		val rootFile: String = rootDirectory                        // stores root directory
 
 		// NOTE: Do not declare a val before you put data in it like you would in java.
 
 		/* Prepare a list of files before hashes are generated */
-		val dirList = getSubDirList( rootFile )                     // Converts array to a List
+		val dirList = getSubDirList( inDirectory )                     // Converts array to a List
 
 		/* There's a good chance I need to recursively go through each subdirectory to get each level of subdirectory
 			 and then loop through all the directories collection to accumulate a list of all files. */
@@ -111,6 +106,7 @@ object IntegrityCheck {
 		} // END loop()
 		loop( fileSet, new mutable.TreeMap[String, String]() )
 	} // END genHashMap()
+
 	/********************CONVERT DIRECTORY TO LIST OF SUB-ITEMS****************************
 		*       Methods accept a String directory name & converts to Array of Strings.      *                                                       *
 		**************************************************************************************/
@@ -174,48 +170,21 @@ object IntegrityCheck {
 				e.printStackTrace()
 			}
 		} // END try/catch
-
-
 	} // END makeHash
 
 	private def makeTwitterHash( fileName: File ): String = {
-
-		fileBytes = java.nio.file.Files.readAllByte(fileName)
-		KeyHasher.FNV1_32.hashKey(fileBytes) // this is a test. The algorithm was not chosen yet.
+		// in order to do this method, the genTreeMap method must change back
+		// to (new File(*))
+		val pathName = fileName.toPath() // convert File to Path
+		val fileBytes = new Files
+		val byteArray = fileBytes.readAllBytes(pathName)
+		KeyHasher.FNV1_32.hashKey(byteArray) // this is a test. The algorithm was not chosen yet.
 	}
 
-/*
-	private def makeGoogleHash( fileName: File): String = {
-		try {
-			return new com.google.common.hash.Hasher.putObject(fileName)
-		}
-		catch {
-			case e: IOException => {
-				// print message
-				e.printStackTrace()
-			}
-		} // END try/catch
-	} // END makeGoogleHash()
-
-  // KeyHasher.FNV1_32.hashKey(Byte[])
-
-	private def makeHash2(fileName: File): String = {
-		/**
-			* Using Twitter's util API to hash functions.
-			*/
-
-		private def inputStreamDigest() { /*Method below was changed from getAbsoluteFile() */
-			val data = System.getProperty( fileName.getAbsolutePath )   // See System API, method requires 2 params.
-			val file = new File(data)
-
+	/*
+		private def makeGoogleHash( fileName: File): String = {
 			try {
-				val inputStream = new FileInputStream( fileName )
-				val digest = {
-					DigestUtils.sha256Hex( inputStream )
-				} // this should not be sha1Hex()
-				// System.out.println("Digest          = " + digest)
-				// System.out.println("Digest.length() = " + digest.length)
-				return digest.toString()
+				return new com.google.common.hash.Hasher.putObject(fileName)
 			}
 			catch {
 				case e: IOException => {
@@ -223,9 +192,37 @@ object IntegrityCheck {
 					e.printStackTrace()
 				}
 			} // END try/catch
-		} // END inputStreamDigest()
-		inputStreamDigest()
-	} // END makeHash()
-	*/
+		} // END makeGoogleHash()
+
+		// KeyHasher.FNV1_32.hashKey(Byte[])
+
+		private def makeHash2(fileName: File): String = {
+			/**
+				* Using Twitter's util API to hash functions.
+				*/
+
+			private def inputStreamDigest() { /*Method below was changed from getAbsoluteFile() */
+				val data = System.getProperty( fileName.getAbsolutePath )   // See System API, method requires 2 params.
+				val file = new File(data)
+
+				try {
+					val inputStream = new FileInputStream( fileName )
+					val digest = {
+						DigestUtils.sha256Hex( inputStream )
+					} // this should not be sha1Hex()
+					// System.out.println("Digest          = " + digest)
+					// System.out.println("Digest.length() = " + digest.length)
+					return digest.toString()
+				}
+				catch {
+					case e: IOException => {
+						// print message
+						e.printStackTrace()
+					}
+				} // END try/catch
+			} // END inputStreamDigest()
+			inputStreamDigest()
+		} // END makeHash()
+		*/
 
 } // END IntegrityCheck class
