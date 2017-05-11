@@ -36,7 +36,7 @@ import java.guava-com.google.common.hash
 import java.security.{MessageDigest, DigestInputStream}
 import java.io.{File, FileInputStream}
 
-class IntegrityCheck {
+object IntegrityCheck {
 
 	/***********************************************CLASS CONSTRUCTOR******************************************************/
 	val inDirectory: String = "C:\\Users\\"
