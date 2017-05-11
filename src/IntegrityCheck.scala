@@ -13,12 +13,9 @@ package com.BigBrainSecurity
 	*
 	*/
 
-import java.util
 import java.time.LocalDate
 import java.nio.file.Files
 import java.util.Scanner
-import java.io.IOException
-import java.io.File
 
 import scala.collection.mutable
 import scala.io.Source
@@ -31,7 +28,7 @@ import com.twitter.hashing.KeyHasher
 import com.google.common.hash
 
 import java.security.{MessageDigest, DigestInputStream}
-import java.io.{File, FileInputStream}
+import java.io.{File, FileInputStream, IOException}
 
 object IntegrityCheck {
 
