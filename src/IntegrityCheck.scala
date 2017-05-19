@@ -230,6 +230,4 @@ object IntegrityCheck {
 			} // END inputStreamDigest()
 			inputStreamDigest()
 		} // END makeHash()
-
-
 } // END IntegrityCheck class
