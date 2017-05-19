@@ -5,13 +5,13 @@ package com.BigBrainSecurity
 	* (#)Version: 1.0
 	* (#)Date: 5/8/2017
 	* 
-	* Author's Note: This is going to be an extremely long term project because I still have a lot to learn about
-	* the Volatility Framework in Python and I haven't even started studying file forensics yet. The reason I am using
-	* Scala is because I intend to make this program run with parallel processing. Scala is an extremely difficult 
-	* language to learn. If I wasn't already so deep into Scala, I probably would have stuck with Python. Nevertheless,
-	* I'm glad I'm learning Scala because Scala has made me a million times better programmer in general. Nevertheless, 
-	* it hurts my brain everyday. 
-  *
+	* Author's Note: I am still learning Scala so this is going to be an extremely long term project. 
+	* I still have a lot to learn about the Volatility Framework in Python and I haven't even started 
+	* studying file forensics yet. The reason I am using Scala is because I intend to make this program 
+	* run with parallel processing. Scala is an extremely difficult language to learn. If I wasn't already so 
+	* deep into Scala, I probably would have stuck with Python. Nevertheless, I'm glad I'm learning Scala 
+	* because Scala has made me a million times better programmer in general. Nevertheless, it hurts my brain everyday. 
+        *
 	* PROGRAM PURPOSE: To test critical files and see if changes have been made.
 	*
 	* IntegrityCheck.scala is a super class of BigBrainSecurity.scala. This program will be the workhorse behind
@@ -31,7 +31,7 @@ import scala.io.Source
 
 object IntegrityCheck {
 
-	/*********************************************GLOBAL VARIABLES (Probably Unnecessary******************************/
+	/*********************************************GLOBAL VARIABLES (Probably Unnecessary)******************************/
 	val inDirectory: String = "C:\\Users\\" // stores root directory
 	val outDirectory: String = null
 
