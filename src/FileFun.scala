@@ -1,11 +1,14 @@
 package com.BigBrainSecurity
 
-import java.io.{File, BufferedWriter, FileWriter}
+import java.io.{BufferedWriter, File, FileInputStream, FileWriter}
+import java.time.LocalDate
+import com.google.common.io.Files
 import scala.io.Source
 /**
-	* Purpose: This program will be used in other classes for common file operations
+	* Purpose: This program will be used in other classes for
+	* common file operations
 	*/
-trait FileFun[T] {
+trait FileFun {
 	/*******Function takes a single String and writes it to a file that is generated based on the fileTreeMap***********/
 	def writeToTxtFile(txt: String, file: String): Unit ={
 		val fileName: String = file
@@ -37,4 +40,26 @@ trait FileFun[T] {
 		return ( new File(directoryName) ).listFiles.filter(_.isFile).map(_.getAbsolutePath)
 	}
 
-} // END FileFun
+	/***************GENERATE STRING TO USE FOR FILENAMES***************************
+		*   Each time a method calls one of the methods below, they should also     *
+		*   increment a counter and add that number to the beginning of the String. *
+		******************************************************************************/
+	def generateJSONFileName(str: String): String = {
+		// This filename generation technique makes it difficult to compare imported files.
+		val dateGen = new LocalDate()
+		return String.format("JSON%s", dateGen.toString)
+	} // END generateFileName()
+
+	def generateTxtFileName(str: String): String = {
+		// This filename generation technique makes it difficult to compare imported files.
+		val dateGen = new LocalDate()
+		return String.format("Txt%s", dateGen.toString)
+	} // END generateFileName()
+
+
+	// convert a file to a Byte Array
+	def fileToByteArray(file: File): Array[Byte] = {
+		val byteArray: Array[Byte] = new Files(file).toByteArray()
+		return byteArray
+	} // END fileToByteArray()
+} // END FileFun.scala
