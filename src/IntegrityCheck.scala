@@ -28,15 +28,13 @@ import java.io.{File, FileInputStream, IOException}
 import scala.collection.immutable.{HashMap, TreeMap}
 import scala.math.Ordering
 
-object IntegrityCheck extends FileFun{
-
-	/*********************************************GLOBAL VARIABLES (Probably Unnecessary)******************************/
-	val inDirectory: String = "C:\\Users\\" // stores root directory
-	val outDirectory: String = null
+object IntegrityCheck extends FileFun {
 
 	/*************************************************MAIN METHOD*****************************************************/
 	def main(args: Array[String]): Unit = {
 
+	  val inDirectory: String = "C:\\Users\\" // stores root directory of OS.
+	  val outDirectory: String = null         // stores destination directory
 		// NOTE: Do not declare a val before you put data in it like you would in java.
 
 		/* Prepare a list of files before hashes are generated */
