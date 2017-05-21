@@ -3,8 +3,7 @@ package com.BigBrainSecurity
 import java.io.{File, BufferedWriter, FileWriter}
 import scala.io.Source
 /**
-	* Purpose: This program will be used in other classes for
-	* common file operations
+	* Purpose: This program will be used in other classes for common file operations
 	*/
 trait FileFun[T] {
 	/*******Function takes a single String and writes it to a file that is generated based on the fileTreeMap***********/
