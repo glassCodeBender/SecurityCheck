@@ -27,9 +27,8 @@ import java.security.{MessageDigest, DigestInputStream}
 import java.io.{File, FileInputStream, IOException}
 import scala.collection.immutable.{HashMap, TreeMap}
 import scala.math.Ordering
-import scala.io.Source
 
-object IntegrityCheck {
+object IntegrityCheck extends FileFun{
 
 	/*********************************************GLOBAL VARIABLES (Probably Unnecessary)******************************/
 	val inDirectory: String = "C:\\Users\\" // stores root directory
