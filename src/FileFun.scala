@@ -55,9 +55,8 @@ trait FileFun {
 		val dateGen = new LocalDate()
 		return String.format("Txt%s", dateGen.toString)
 	} // END generateFileName()
-
-
-	// convert a file to a Byte Array
+	
+	/* convert a file to a Byte Array */
 	def fileToByteArray(file: File): Array[Byte] = {
 		val byteArray: Array[Byte] = new Files(file).toByteArray()
 		return byteArray
