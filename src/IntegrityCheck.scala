@@ -4,14 +4,14 @@ package com.BigBrainSecurity
 	* (@)Author: glassCodeBender
 	* (#)Version: 1.0
 	* (#)Date: 5/8/2017
-	* 
-	* Author's Note: I am still learning Scala so this is going to be an extremely long term project. 
-	* I still have a lot to learn about the Volatility Framework in Python and I haven't even started 
-	* studying file forensics yet. The reason I am using Scala is because I intend to make this program 
-	* run with parallel processing. Scala is an extremely difficult language to learn. If I wasn't already so 
-	* deep into Scala, I probably would have stuck with Python. Nevertheless, I'm glad I'm learning Scala 
-	* because Scala has made me a million times better programmer in general. Nevertheless, it hurts my brain everyday. 
-        *
+	*
+	* Author's Note: This is going to be an extremely long term project because I still have a lot to learn about
+	* the Volatility Framework in Python and I haven't even started studying file forensics yet. The reason I am using
+	* Scala is because I intend to make this program run with parallel processing. Scala is an extremely difficult
+	* language to learn. If I wasn't already so deep into Scala, I probably would have stuck with Python. Nevertheless,
+	* I'm glad I'm learning Scala because Scala has made me a million times better programmer in general. Nevertheless,
+	* it hurts my brain everyday.
+  *
 	* PROGRAM PURPOSE: To test critical files and see if changes have been made.
 	*
 	* IntegrityCheck.scala is a super class of BigBrainSecurity.scala. This program will be the workhorse behind
@@ -21,20 +21,22 @@ package com.BigBrainSecurity
 	*/
 
 import com.twitter.hashing.KeyHasher
-import org.apache.commons.codec.digest
-import java.nio.file.Files
+import org.apache.commons.codec
+import java.nio.file.{Files, Paths}
 import java.security.{MessageDigest, DigestInputStream}
 import java.io.{File, FileInputStream, IOException}
 import scala.collection.immutable.{HashMap, TreeMap}
 import scala.math.Ordering
 
-object IntegrityCheck extends FileFun {
+object IntegrityCheck extends FileFun[String] {
+
+	/*********************************************GLOBAL VARIABLES (Probably Unnecessary******************************/
+	val inDirectory: String = "C:\\Users\\" // stores root directory
+	val outDirectory: String = null
 
 	/*************************************************MAIN METHOD*****************************************************/
 	def main(args: Array[String]): Unit = {
 
-	  val inDirectory: String = "C:\\Users\\" // stores root directory of OS.
-	  val outDirectory: String = null         // stores destination directory
 		// NOTE: Do not declare a val before you put data in it like you would in java.
 
 		/* Prepare a list of files before hashes are generated */
@@ -100,6 +102,14 @@ object IntegrityCheck extends FileFun {
 		} // END loop()
 		loop( fileSet, new TreeMap[String, String]() )
 	} // END genMap()
+
+	def genTreeMap(fileSet: Seq[String])(implicit ord: Ordering[String]): TreeMap[String, String] = {
+		def loop(fileSet: Seq[String], accTreeMap: TreeMap[String, String]): TreeMap[String, String] = {
+			if (fileSet.isEmpty) accTreeMap
+			else loop(fileSet.tail, accTreeMap + (fileSet.head -> makeHash( fileSet.head))
+		} // END loop()
+		loop( fileSet, new TreeMap[String, String]() )
+	} // END genMap()
 /*
 	// Some hashing methods require File objects, others use Strings.
 	def genFileTreeMap(fileSet: Seq[String]): TreeMap[String, File] = {
@@ -110,6 +120,8 @@ object IntegrityCheck extends FileFun {
 		loop( fileSet, new TreeMap[String, File]() )
 	} // END genFileMap()
 */
+
+
 	/*****************************************CONVERTS A FILE TO A HASH VALUE*****************************************/
 	/*Building
 
@@ -142,6 +154,7 @@ object IntegrityCheck extends FileFun {
 
 	// Consider using different algorithms based on file size.
 	private def makeHash( fileName: String ): String = {
+
 		try {
 			val buffer = new Array[Byte](8192)
 			val md5 = MessageDigest.getInstance("MD5")
@@ -159,11 +172,11 @@ object IntegrityCheck extends FileFun {
 	} // END makeHash
 
 	// NOTE: readAllBytes() may not work for large files. If the file size is over a certain amount,
-	// Use makeTwitterHash. Else Use makeHash. 
-	private def makeTwitterHash( fileName: File ): String = {
+	// Use makeTwitterHash. Else Use makeHash.
+	private def makeTwitterHash( fileName: String ): String = {
 		// in order to do this method, the genMap method must change back
 		// to (new File(*))
-		val pathName = fileName.toPath() // convert File to Path
+		val pathName = Paths.get(fileName) // convert File to Path
 		val fileBytes = new Files()
 		val byteArray = fileBytes.readAllBytes(pathName)
 		KeyHasher.FNV1_32.hashKey(byteArray) // this is a test. The algorithm was not chosen yet.
@@ -210,4 +223,6 @@ object IntegrityCheck extends FileFun {
 			} // END inputStreamDigest()
 			inputStreamDigest()
 		} // END makeHash()
+
+
 } // END IntegrityCheck class
