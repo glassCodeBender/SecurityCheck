@@ -1,6 +1,6 @@
 package com.BigBrainSecurity
 
-import java.io.{BufferedWriter, File, FileInputStream, FileWriter}
+import java.io.{BufferedWriter, File, FileWriter}
 import java.time.LocalDate
 import com.google.common.io.Files
 import scala.io.Source
@@ -28,17 +28,48 @@ trait FileFun {
 		*       Methods accept a String directory name & converts to List or Seq of Strings.      *                                                       *
 		**************************************************************************************/
 	// Why can't I make this code return a ListBuffer? Is it because listFiles() is an Array method?
-	def getSubDirList(directoryName: String): Seq[String] = {
-		return ( new File(directoryName) ).listFiles.filter(_.isDirectory).map(_.getName )
+
+	def getDirList(directoryName: String): Array[String] = {
+		( new File(directoryName) ).listFiles.filter(_.isDirectory).map(_.getAbsolutePath)
 	}
+
 	// I'm removing the filter so that this method will get a list of all directories and files.
-	def getFileList(dirName: String): Seq[String] = {
-		return ( new File(dirName) ).listFiles.map(_.getAbsolutePath)
+	def getFileList(dirName: String): List[String] = {
+		( new File(dirName) ).listFiles.map(_.getAbsolutePath).toList
 	}
 
 	def getFileArray(directoryName: String): Array[String] = {
-		return ( new File(directoryName) ).listFiles.filter(_.isFile).map(_.getAbsolutePath)
+		( new File(directoryName) ).listFiles.filter(_.isFile).map(_.getAbsolutePath)
 	}
+	
+	def fullDirList(directories: Array[String]): Array[String] = directories.flatMap( d => d +: fullDirList( getDirList( d ) ) )
+	
+	/**
+		* Need a method that goes through a list of directories, makes a list of directories,
+		* and appends it to the main list of directories.
+		* If this method is difficult to write, write it as a for loop and then change it to recursion.
+		* @param directories
+		*/
+
+	def getFullDirList(directories: Array[String]): Array[String] = {
+		def loop(dir: Array[String], accDir: Array[String]): Array[String] = {
+			if (dir.isEmpty) accDir
+			else loop( dir.tail, accDir ++: getFullDirList( getDirList( dir.head ) ) )
+		} // END loop()
+		loop(directories, Array[String]())
+	} // END getFullDirList()
+
+	def getFullFileList(directories: Array[String]): Array[String] = {
+		def loop(dir: Array[String], accArray: Array[String]): Array[String] = {
+			if (dir.isEmpty) accArray
+			else loop(dir, accArray ++ getFileArray(directories.head))
+		}
+		loop(directories, Array[String]())
+	} // END getFullFileList
+
+
+	def fullFileList(directories: Array[String]) = directories.foldLeft(Array[String]()){(x, y) => x ++ getFileArray(y))}
+
 
 	/***************GENERATE STRING TO USE FOR FILENAMES***************************
 		*   Each time a method calls one of the methods below, they should also     *
@@ -55,8 +86,9 @@ trait FileFun {
 		val dateGen = new LocalDate()
 		return String.format("Txt%s", dateGen.toString)
 	} // END generateFileName()
-	
-	/* convert a file to a Byte Array */
+
+
+	// convert a file to a Byte Array
 	def fileToByteArray(file: File): Array[Byte] = {
 		val byteArray: Array[Byte] = new Files(file).toByteArray()
 		return byteArray
