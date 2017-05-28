@@ -41,9 +41,9 @@ trait FileFun {
 	def getFileArray(directoryName: String): Array[String] = {
 		( new File(directoryName) ).listFiles.filter(_.isFile).map(_.getAbsolutePath)
 	}
-	
+
 	def fullDirList(directories: Array[String]): Array[String] = directories.flatMap( d => d +: fullDirList( getDirList( d ) ) )
-	
+
 	/**
 		* Need a method that goes through a list of directories, makes a list of directories,
 		* and appends it to the main list of directories.
@@ -67,10 +67,8 @@ trait FileFun {
 		loop(directories, Array[String]())
 	} // END getFullFileList
 
-
-	def fullFileList(directories: Array[String]) = directories.foldLeft(Array[String]()){(x, y) => x ++ getFileArray(y))}
-
-
+	def fullFileList(directories: Array[String]) = directories.foldLeft(Array[String]()){(x, y) => x ++: getFileArray(y))}
+	
 	/***************GENERATE STRING TO USE FOR FILENAMES***************************
 		*   Each time a method calls one of the methods below, they should also     *
 		*   increment a counter and add that number to the beginning of the String. *
@@ -86,8 +84,7 @@ trait FileFun {
 		val dateGen = new LocalDate()
 		return String.format("Txt%s", dateGen.toString)
 	} // END generateFileName()
-
-
+	
 	// convert a file to a Byte Array
 	def fileToByteArray(file: File): Array[Byte] = {
 		val byteArray: Array[Byte] = new Files(file).toByteArray()
