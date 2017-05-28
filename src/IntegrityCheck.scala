@@ -23,8 +23,9 @@ package com.BigBrainSecurity
 import com.twitter.hashing.KeyHasher
 import org.apache.commons.codec.DigestUtils
 import java.nio.file.{Files, Paths}
-import java.security.{MessageDigest, DigestInputStream}
+import java.security.{DigestInputStream, MessageDigest}
 import java.io.{File, FileInputStream, IOException}
+
 import scala.collection.immutable.{HashMap, TreeMap}
 import scala.math.Ordering
 
@@ -82,7 +83,7 @@ object IntegrityCheck extends FileFun[String] {
 		def loop(fileSet: Seq[String], accMap: HashMap[String, String]): HashMap[String, String] = {
 			// val hashMapAcc = new HashMap(fileSet.head -> makeHash(fileSet.head))
 			if (fileSet.isEmpty) accMap
-			else loop(fileSet.tail, accMap + (fileSet.head -> makeHash(fileSet.head)))
+			else loop(fileSet.tail, accMap + (fileSet.head -> HashGenerator.generate("SHA256", fileSet.head))
 		} // END loop()
 		loop( fileSet, new HashMap[String, String]() )
 	} // END genMap()
@@ -112,6 +113,8 @@ object IntegrityCheck extends FileFun[String] {
 		loop( fileSet, new TreeMap[String, File]() )
 	} // END genFileMap()
 */
+
+
 	/*****************************************CONVERTS A FILE TO A HASH VALUE*****************************************/
 	/*Building
 
@@ -141,6 +144,9 @@ object IntegrityCheck extends FileFun[String] {
 	val distributor = new KetamaDistributor(nodes, KeyHasher.FNV1_32)
 	distributor.nodeForKey("abc") // => client
 	*/
+
+
+
 
 	// Consider using different algorithms based on file size.
 	private def makeHash( fileName: String ): String = {
@@ -186,6 +192,7 @@ object IntegrityCheck extends FileFun[String] {
 			} // END try/catch
 		} // END makeGoogleHash()
 */
+
 		private def makeHash2(fileName: File): String = {
 			/**
 				* Need to add sbt dependency for apache commons.
@@ -206,6 +213,8 @@ object IntegrityCheck extends FileFun[String] {
 				}
 				catch {
 					case e: IOException => {
+
+
 						// print message
 						e.printStackTrace()
 					}
@@ -213,4 +222,18 @@ object IntegrityCheck extends FileFun[String] {
 			} // END inputStreamDigest()
 			inputStreamDigest()
 		} // END makeHash()
+
+
 } // END IntegrityCheck class
+
+object HashGenerator {
+	implicit class Helper(val sc: StringContext) extends AnyVal {
+		def md5(): String = generate("MD5", sc.parts(0))
+		def sha256(): String = generate("SHA256", sc.parts(0))
+	}
+	def generate(t: String, path: String): String = {
+		val arr = Files.readAllBytes(Paths.get(path))
+		val checksum = MessageDigest.getInstance(t) digest arr
+		checksum.map("%02X" format _).mkString
+	}
+}
