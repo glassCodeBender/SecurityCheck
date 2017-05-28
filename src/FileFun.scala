@@ -41,7 +41,7 @@ trait FileFun {
 	def getFileArray(directoryName: String): Array[String] = {
 		( new File(directoryName) ).listFiles.filter(_.isFile).map(_.getAbsolutePath)
 	}
-	
+
 	/**
 		* Need a method that goes through a list of directories, makes a list of directories,
 		* and appends it to the main list of directories.
@@ -59,10 +59,10 @@ trait FileFun {
 		loop(dirList, Array[String]())
 	}
 
-	def getFullFileList(directories: Array[String]): Array[String] = {
+	def getAllFiles(directories: Array[String]): Array[String] = {
 		def loop(dir: Array[String], accArray: Array[String]): Array[String] = {
 			if (dir.isEmpty) accArray
-			else loop(dir, accArray ++ getFileArray(directories.head))
+			else loop(dir.tail, accArray ++: getFileArray(directories.head))
 		}
 		loop(directories, Array[String]())
 	} // END getFullFileList
