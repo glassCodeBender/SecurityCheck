@@ -21,7 +21,7 @@ package com.BigBrainSecurity
 	*/
 
 import com.twitter.hashing.KeyHasher
-import org.apache.commons.codec
+import org.apache.commons.codec.DigestUtils
 import java.nio.file.{Files, Paths}
 import java.security.{MessageDigest, DigestInputStream}
 import java.io.{File, FileInputStream, IOException}
@@ -31,7 +31,7 @@ import scala.math.Ordering
 object IntegrityCheck extends FileFun[String] {
 
 	/*********************************************GLOBAL VARIABLES (Probably Unnecessary******************************/
-	val inDirectory: String = "C:\\Users\\" // stores root directory
+	val inDirectory: String = "/Users" // stores root directory
 	val outDirectory: String = null
 
 	/*************************************************MAIN METHOD*****************************************************/
@@ -40,19 +40,11 @@ object IntegrityCheck extends FileFun[String] {
 		// NOTE: Do not declare a val before you put data in it like you would in java.
 
 		/* Prepare a list of files before hashes are generated */
-		val dirList = getSubDirList( inDirectory )                     // Converts array to a List
-
-		/* There's a good chance I need to recursively go through each subdirectory to get each level of subdirectory
-			 and then loop through all the directories collection to accumulate a list of all files. */
-
-		val fileList = getFileList( fileList )                        // Gets an array of String filenames & converts them into set.
-
-		val newFileList: Seq[String] = dirList.flatMap( x => getFileList(x) )   // For each directory in file system, get the files in it.
+		val dirArray = getAllDirs(inDirectory)                    // Converts array to a List
+    val allFilesArray = getAllFiles(dirArray)
 
 		/* Generate hash values and store them in a Map or Map. Both methods are shown so I can compare time. */
-		val newMap: HashMap[String, String] = genMap(newFileList)
-
-		fileList.foreach( println ) // THIS IS A TEST
+		val newMap: HashMap[String, String] = genMap(allFilesArray)
 
 		/* Import previous JSON file and store previous values in a Map */
 
@@ -90,7 +82,7 @@ object IntegrityCheck extends FileFun[String] {
 		def loop(fileSet: Seq[String], accMap: HashMap[String, String]): HashMap[String, String] = {
 			// val hashMapAcc = new HashMap(fileSet.head -> makeHash(fileSet.head))
 			if (fileSet.isEmpty) accMap
-			else loop(fileSet.tail, accMap + (fileSet.head -> makeHash(fileSet.head))
+			else loop(fileSet.tail, accMap + (fileSet.head -> makeHash(fileSet.head)))
 		} // END loop()
 		loop( fileSet, new HashMap[String, String]() )
 	} // END genMap()
@@ -98,7 +90,7 @@ object IntegrityCheck extends FileFun[String] {
 	def genTreeMap(fileSet: Seq[String])(implicit ord: Ordering[String]): TreeMap[String, String] = {
 		def loop(fileSet: Seq[String], accTreeMap: TreeMap[String, String]): TreeMap[String, String] = {
 			if (fileSet.isEmpty) accTreeMap
-			else loop(fileSet.tail, accTreeMap + (fileSet.head -> makeHash( fileSet.head))
+			else loop(fileSet.tail, accTreeMap + (fileSet.head -> makeHash( fileSet.head)))
 		} // END loop()
 		loop( fileSet, new TreeMap[String, String]() )
 	} // END genMap()
@@ -106,7 +98,7 @@ object IntegrityCheck extends FileFun[String] {
 	def genTreeMap(fileSet: Seq[String])(implicit ord: Ordering[String]): TreeMap[String, String] = {
 		def loop(fileSet: Seq[String], accTreeMap: TreeMap[String, String]): TreeMap[String, String] = {
 			if (fileSet.isEmpty) accTreeMap
-			else loop(fileSet.tail, accTreeMap + (fileSet.head -> makeHash( fileSet.head))
+			else loop(fileSet.tail, accTreeMap + (fileSet.head -> makeHash( fileSet.head)))
 		} // END loop()
 		loop( fileSet, new TreeMap[String, String]() )
 	} // END genMap()
@@ -120,8 +112,6 @@ object IntegrityCheck extends FileFun[String] {
 		loop( fileSet, new TreeMap[String, File]() )
 	} // END genFileMap()
 */
-
-
 	/*****************************************CONVERTS A FILE TO A HASH VALUE*****************************************/
 	/*Building
 
@@ -155,6 +145,7 @@ object IntegrityCheck extends FileFun[String] {
 	// Consider using different algorithms based on file size.
 	private def makeHash( fileName: String ): String = {
 
+		// add if statement to check the size of the file. If the file is less than x amount, use this. Else use twitter.
 		try {
 			val buffer = new Array[Byte](8192)
 			val md5 = MessageDigest.getInstance("MD5")
@@ -195,7 +186,6 @@ object IntegrityCheck extends FileFun[String] {
 			} // END try/catch
 		} // END makeGoogleHash()
 */
-
 		private def makeHash2(fileName: File): String = {
 			/**
 				* Need to add sbt dependency for apache commons.
@@ -223,6 +213,4 @@ object IntegrityCheck extends FileFun[String] {
 			} // END inputStreamDigest()
 			inputStreamDigest()
 		} // END makeHash()
-
-
 } // END IntegrityCheck class
