@@ -67,8 +67,8 @@ trait FileFun {
 		loop(directories, Array[String]())
 	} // END getFullFileList
 
-	def fullFileList(directories: Array[String]) = directories.foldLeft(Array[String]()){(x, y) => x ++: getFileArray(y))}
-	
+	def fullFileList(directories: Array[String]) = directories.foldLeft(Array[String]()){ (x, y) => x ++: getFileArray(y) }
+
 	/***************GENERATE STRING TO USE FOR FILENAMES***************************
 		*   Each time a method calls one of the methods below, they should also     *
 		*   increment a counter and add that number to the beginning of the String. *
@@ -84,7 +84,7 @@ trait FileFun {
 		val dateGen = new LocalDate()
 		return String.format("Txt%s", dateGen.toString)
 	} // END generateFileName()
-	
+
 	// convert a file to a Byte Array
 	def fileToByteArray(file: File): Array[Byte] = {
 		val byteArray: Array[Byte] = new Files(file).toByteArray()
