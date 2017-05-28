@@ -41,23 +41,15 @@ trait FileFun {
 	def getFileArray(directoryName: String): Array[String] = {
 		( new File(directoryName) ).listFiles.filter(_.isFile).map(_.getAbsolutePath)
 	}
-
-	def fullDirList(directories: Array[String]): Array[String] = directories.flatMap( d => d +: fullDirList( getDirList( d ) ) )
-
-	/**
-		* Need a method that goes through a list of directories, makes a list of directories,
-		* and appends it to the main list of directories.
-		* If this method is difficult to write, write it as a for loop and then change it to recursion.
-		* @param directories
-		*/
-
-	def getFullDirList(directories: Array[String]): Array[String] = {
-		def loop(dir: Array[String], accDir: Array[String]): Array[String] = {
-			if (dir.isEmpty) accDir
-			else loop( dir.tail, accDir ++: getFullDirList( getDirList( dir.head ) ) )
-		} // END loop()
-		loop(directories, Array[String]())
-	} // END getFullDirList()
+	
+  def getAllDirs(dir: String): Array[String] = {
+	  val dirList = getDirList(dir)
+	  def loop(directories: Array[String], accList: Array[String]): Array[String] = {
+		  if(directories.isEmpty) accList
+		  else loop(directories.tail, accList ++: getDirList(directories.head))
+	  }
+	  loop(dirList, Array[String]())
+  }
 
 	def getFullFileList(directories: Array[String]): Array[String] = {
 		def loop(dir: Array[String], accArray: Array[String]): Array[String] = {
