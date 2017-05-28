@@ -32,12 +32,7 @@ trait FileFun {
 	def getDirList(directoryName: String): Array[String] = {
 		( new File(directoryName) ).listFiles.filter(_.isDirectory).map(_.getAbsolutePath)
 	}
-
-	// I'm removing the filter so that this method will get a list of all directories and files.
-	def getFileList(dirName: String): List[String] = {
-		( new File(dirName) ).listFiles.map(_.getAbsolutePath).toList
-	}
-
+	
 	def getFileArray(directoryName: String): Array[String] = {
 		( new File(directoryName) ).listFiles.filter(_.isFile).map(_.getAbsolutePath)
 	}
@@ -48,7 +43,6 @@ trait FileFun {
 		* If this method is difficult to write, write it as a for loop and then change it to recursion.
 		* @param dir: Accepts a directory to start from.
 		*/
-
 
 	def getAllDirs(dir: String): Array[String] = {
 		val dirList = getDirList(dir)
