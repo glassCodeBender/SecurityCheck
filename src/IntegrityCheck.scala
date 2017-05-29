@@ -21,7 +21,7 @@ package com.BigBrainSecurity
 	*/
 
 import com.twitter.hashing.KeyHasher
-import org.apache.commons.codec.DigestUtils
+import org.apache._
 import java.nio.file.{Files, Paths}
 import java.security.{DigestInputStream, MessageDigest}
 import java.io.{File, FileInputStream, IOException}
@@ -29,7 +29,7 @@ import java.io.{File, FileInputStream, IOException}
 import scala.collection.immutable.{HashMap, TreeMap}
 import scala.math.Ordering
 
-object IntegrityCheck extends FileFun[String] {
+object IntegrityCheck extends FileFun {
 
 	/*********************************************GLOBAL VARIABLES (Probably Unnecessary******************************/
 	val inDirectory: String = "/Users" // stores root directory
@@ -83,7 +83,7 @@ object IntegrityCheck extends FileFun[String] {
 		def loop(fileSet: Seq[String], accMap: HashMap[String, String]): HashMap[String, String] = {
 			// val hashMapAcc = new HashMap(fileSet.head -> makeHash(fileSet.head))
 			if (fileSet.isEmpty) accMap
-			else loop(fileSet.tail, accMap + (fileSet.head -> HashGenerator.generate("SHA256", fileSet.head))
+			else loop(fileSet.tail, accMap + (fileSet.head -> HashGenerator.generate("SHA256", fileSet.head)))
 		} // END loop()
 		loop( fileSet, new HashMap[String, String]() )
 	} // END genMap()
@@ -91,7 +91,7 @@ object IntegrityCheck extends FileFun[String] {
 	def genTreeMap(fileSet: Seq[String])(implicit ord: Ordering[String]): TreeMap[String, String] = {
 		def loop(fileSet: Seq[String], accTreeMap: TreeMap[String, String]): TreeMap[String, String] = {
 			if (fileSet.isEmpty) accTreeMap
-			else loop(fileSet.tail, accTreeMap + (fileSet.head -> makeHash( fileSet.head)))
+			else loop(fileSet.tail, accTreeMap + (fileSet.head -> HashGenerator.generate("SHA256", fileSet.head)))
 		} // END loop()
 		loop( fileSet, new TreeMap[String, String]() )
 	} // END genMap()
@@ -99,7 +99,7 @@ object IntegrityCheck extends FileFun[String] {
 	def genTreeMap(fileSet: Seq[String])(implicit ord: Ordering[String]): TreeMap[String, String] = {
 		def loop(fileSet: Seq[String], accTreeMap: TreeMap[String, String]): TreeMap[String, String] = {
 			if (fileSet.isEmpty) accTreeMap
-			else loop(fileSet.tail, accTreeMap + (fileSet.head -> makeHash( fileSet.head)))
+			else loop(fileSet.tail, accTreeMap + (fileSet.head -> makeTwitterHash( fileSet.head)))
 		} // END loop()
 		loop( fileSet, new TreeMap[String, String]() )
 	} // END genMap()
@@ -145,9 +145,6 @@ object IntegrityCheck extends FileFun[String] {
 	distributor.nodeForKey("abc") // => client
 	*/
 
-
-
-
 	// Consider using different algorithms based on file size.
 	private def makeHash( fileName: String ): String = {
 
@@ -173,9 +170,7 @@ object IntegrityCheck extends FileFun[String] {
 	private def makeTwitterHash( fileName: String ): String = {
 		// in order to do this method, the genMap method must change back
 		// to (new File(*))
-		val pathName = Paths.get(fileName) // convert File to Path
-		val fileBytes = new Files()
-		val byteArray = fileBytes.readAllBytes(pathName)
+		val byteArray = Files.readAllBytes(Paths get fileName)
 		KeyHasher.FNV1_32.hashKey(byteArray) // this is a test. The algorithm was not chosen yet.
 	} // END makeTwitterHash()
 
@@ -213,8 +208,6 @@ object IntegrityCheck extends FileFun[String] {
 				}
 				catch {
 					case e: IOException => {
-
-
 						// print message
 						e.printStackTrace()
 					}
@@ -222,7 +215,6 @@ object IntegrityCheck extends FileFun[String] {
 			} // END inputStreamDigest()
 			inputStreamDigest()
 		} // END makeHash()
-
 
 } // END IntegrityCheck class
 
