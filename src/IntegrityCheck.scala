@@ -28,7 +28,7 @@ import scala.collection.immutable.{HashMap, TreeMap}
 import scala.math.Ordering
 
 // THIS WORKS. Only change checksum method.
-object HashGenerator {
+object HashGenerator{
 	def generate( path: String ): String = {
 		val byteArray = Files.readAllBytes( Paths get path )
 		val checksum = MessageDigest.getInstance( "SHA-256" ) digest byteArray
@@ -50,20 +50,14 @@ object IntegrityCheck extends FileFun {
 
 		/* Prepare a list of files before hashes are generated */
 
-
 		/* These values should be set by the configuration file. */
 		val userList = getAllDirs("/Users")
 		// fullList.foreach(println)
-		userList.length
 		val systemList = getAllDirs("/System")
-		systemList.length
 		val appList = getAllDirs("/Applications")
-		appList.length
 		val libList = getAllDirs("/Library")
-		libList.length
-		val developer = getAllDirs("/Developer")
 
-		val allFilesArray = getAllFiles(userList)
+		val allFilesArray = getAllFiles(userList ++: systemList ++: appList ++: libList )
 		// If this program is going to run on parallel cores, one of the TreeMaps needs to get split up and
 		// the other other TreeMap should stay intact. This ensures that all of the comparisons work.
 		// During the comparisons we should extract the values that were not presents or that do not match into new Tree.
