@@ -8,6 +8,9 @@ import scala.io.Source
 	* @Version 1.0
 	*         
 	* This program will look at a directory of prefetch files and determine inconsistencies.
+	*
+	* Note: The list of common prefetch hashes was obtained from: 
+	* http://www.hexacorn.com/blog/2012/06/13/prefetch-hash-calculator-a-hash-lookup-table-xpvistaw7w2k3w2k8/
 	*/
   
 object AnalyzePrefetch {
