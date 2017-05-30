@@ -27,19 +27,21 @@ import java.security.MessageDigest
 import scala.collection.immutable.{HashMap, TreeMap}
 import scala.math.Ordering
 
+// THIS WORKS. Only change checksum method.
 object HashGenerator {
 	def generate( path: String ): String = {
 		val byteArray = Files.readAllBytes( Paths get path )
 		val checksum = MessageDigest.getInstance( "SHA-256" ) digest byteArray
 		checksum.map( "%02X" format _ ).mkString
 	}
+	def makeTwitterHash( fileName: String ): Long = {
+		// in order to do this method, the genMap method must change back
+		// to (new File(*))
+		val byteArray = Files.readAllBytes(Paths get fileName)
+		KeyHasher.FNV1_32.hashKey(byteArray) } // this is a test. The algorithm was not chosen yet.
 } // END HashGenerator
 
 object IntegrityCheck extends FileFun {
-
-	/*********************************************GLOBAL VARIABLES (Probably Unnecessary******************************/
-	val inDirectory: String = "/Users" // stores root directory
-	val outDirectory: String = null
 
 	/*************************************************MAIN METHOD*****************************************************/
 	def main(args: Array[String]): Unit = {
@@ -47,8 +49,24 @@ object IntegrityCheck extends FileFun {
 		// NOTE: Do not declare a val before you put data in it like you would in java.
 
 		/* Prepare a list of files before hashes are generated */
-		val dirArray = getAllDirs("/Users")                    // Converts array to a List
-    val allFilesArray = getAllFiles(dirArray)
+
+
+		/* These values should be set by the configuration file. */
+		val userList = getAllDirs("/Users")
+		// fullList.foreach(println)
+		userList.length
+		val systemList = getAllDirs("/System")
+		systemList.length
+		val appList = getAllDirs("/Applications")
+		appList.length
+		val libList = getAllDirs("/Library")
+		libList.length
+		val developer = getAllDirs("/Developer")
+
+		val allFilesArray = getAllFiles(userList)
+		// If this program is going to run on parallel cores, one of the TreeMaps needs to get split up and
+		// the other other TreeMap should stay intact. This ensures that all of the comparisons work.
+		// During the comparisons we should extract the values that were not presents or that do not match into new Tree.
 
 		/* Generate hash values and store them in a TreeMap or HashMap. Both methods are shown so I can compare time. */
 
@@ -56,53 +74,39 @@ object IntegrityCheck extends FileFun {
 
 		/* Compare the previous Map's hash values to the new Map's values */
 
-		/* Import BigBrainSecurity config file and check the file's checksum to ensure integrity. */
+		/* Import main.com.paranoidking.BigBrainSecurity config file and check the file's checksum to ensure integrity. */
 
-		/* Import BigBrainSecurity Log File and date for previous log based on data in the config file. */
+		/* Import main.com.paranoidking.BigBrainSecurity Log File and date for previous log based on data in the config file. */
 
 		/* Export new Map and concatenate the result of Integrity Check. */
 
-	} /*******************************************END MAIN METHOD********************************************************/
+		/** ****************************************STORE IN Hash Table *******************************************************/
+		/*
+		 * Methods to create Maps from filename Strings to their hash values.
+		 * Currently SHA-256 is used for the checksums, but the algorithm might change.
+		 */
+		def genMap( fileSet: Seq[ String ] ): HashMap[ String, String ] = {
+			def loop( fileSet: Seq[ String ], accMap: HashMap[ String, String ] ): HashMap[ String, String ] = {
+				// val hashMapAcc = new HashMap(fileSet.head -> makeHash(fileSet.head))
+				if ( fileSet.isEmpty ) accMap
+				else loop( fileSet.tail, accMap + ( fileSet.head -> HashGenerator.generate( fileSet.head ) ) )
+			} // END loop()
+			loop( fileSet, new HashMap[ String, String ]( ) )
+		} // END genMap()
 
-	/******************************************STORE IN Hash Table*******************************************************/
-	/*
-	 * When this method is called, the param needs to call .toList() to convert array to list.
-	 *
-	 * FIRST MAKE THE PROGRAM WORK, THEN WORRY ABOUT OPTIMIZING EFFICIENCY!!!
-	 * SEE EffectiveScala by Marius Eriksen
-	 */
-	def genMap(fileSet: Seq[String]): HashMap[String, String] = {
-		def loop(fileSet: Seq[String], accMap: HashMap[String, String]): HashMap[String, String] = {
-			// val hashMapAcc = new HashMap(fileSet.head -> makeHash(fileSet.head))
-			if (fileSet.isEmpty) accMap
-			else loop(fileSet.tail, accMap + (fileSet.head -> HashGenerator.generate(fileSet.head)))
-		} // END loop()
-		loop( fileSet, new HashMap[String, String]() )
-	} // END genMap()
+		def genTreeMap( fileSet: Seq[ String ] )( implicit ord: Ordering[ String ] ): TreeMap[ String, String ] = {
+			def loop( fileSet: Seq[ String ], accTreeMap: TreeMap[ String, String ] ): TreeMap[ String, String ] = {
+				if ( fileSet.isEmpty ) accTreeMap
+				else loop( fileSet.tail, accTreeMap + ( fileSet.head -> HashGenerator.generate( fileSet.head ) ) )
+			} // END loop()
+			loop( fileSet, new TreeMap[ String, String ]( ) )
+		} // END genMap()
 
-	def genTreeMap(fileSet: Seq[String])(implicit ord: Ordering[String]): TreeMap[String, String] = {
-		def loop(fileSet: Seq[String], accTreeMap: TreeMap[String, String]): TreeMap[String, String] = {
-			if (fileSet.isEmpty) accTreeMap
-			else loop(fileSet.tail, accTreeMap + (fileSet.head -> HashGenerator.generate(fileSet.head)))
-		} // END loop()
-		loop( fileSet, new TreeMap[String, String]() )
-	} // END genMap()
-
-	def genTreeMapTwitter(fileSet: Seq[String])(implicit ord: Ordering[String]): TreeMap[String, String] = {
-		def loop(fileSet: Seq[String], accTreeMap: TreeMap[String, String]): TreeMap[String, String] = {
-			if (fileSet.isEmpty) accTreeMap
-			else loop(fileSet.tail, accTreeMap + (fileSet.head -> makeTwitterHash(fileSet.head)))
-		} // END loop()
-		loop( fileSet, new TreeMap[String, String]() )
-	} // END genMap()
-
-	/*****************************************CONVERTS A FILE TO A HASH VALUE*****************************************/
-
-	// NOTE: readAllBytes() may not work for large files. If the file size is over a certain amount,
-	// Use makeTwitterHash. Else Use makeHash.
-	private def makeTwitterHash( fileName: String ): String = {
-		// in order to do this method, the genMap method must change back
-		// to (new File(*))
-		val byteArray = Files.readAllBytes(Paths get fileName)
-		KeyHasher.FNV1_32.hashKey(byteArray).toString } // this is a test. The algorithm was not chosen yet.
-		
+		def genTreeMapTwitter( fileSet: Seq[ String ] )( implicit ord: Ordering[ String ] ): TreeMap[ String, Long ] = {
+			def loop( fileSet: Seq[ String ], accTreeMap: TreeMap[ String, Long ] ): TreeMap[ String, Long ] = {
+				if ( fileSet.isEmpty ) accTreeMap
+				else loop( fileSet.tail, accTreeMap + ( fileSet.head -> HashGenerator.makeTwitterHash( fileSet.head ) ) )
+			} // END loop()
+			loop( fileSet, new TreeMap[ String, Long ]( ) )
+		} // END genMap()
+	} // END IntegrityCheck.scala
