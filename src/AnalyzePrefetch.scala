@@ -18,7 +18,7 @@ object AnalyzePrefetch {
 	def main(Array[String]): Unit = {
 		val prefFileName = Source.fromFile("/Users/MYUSERNAME/Documents/security/prefetch_hashes_lookup.txt").getLines.toList
 		val reg = """[A-Z0-9]+.\w[-A-Z0-9]+.pf""".r
-		val safePrefetchList = prefFileName.map(reg.findFirstIn(_).mkString
+		val safePrefetchList = prefFileName.map(reg.findFirstIn(_).mkString)
 			
 		// NEXT we need to import all of the prefetches from directory and compare their names to Strings in the safePrefetchList.
 		// We also need to write a regex to extract the prefetch fileNames without the hash values appended to them to use as 
