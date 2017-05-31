@@ -15,7 +15,7 @@ import scala.io.Source
 object AnalyzePrefetch extends FileFun{
 
 	def main(Array[String]): Unit = {
-		val prefFileName = Source.fromFile("/Users/xan0/Documents/security/prefetch_hashes_lookup.txt").getLines.toArray
+		val prefFileName = Source.fromFile("/Users/username/Documents/security/prefetch_hashes_lookup.txt").getLines.toArray
 		val reg = """[A-Z0-9]+.\w[-A-Z0-9]+.pf""".r
 		val safePrefetchList = prefFileName.map(reg.findFirstIn(_).mkString)
 		val otherReg = """[A-Z0-9.]+""".r
