@@ -33,10 +33,10 @@ object AnalyzePrefetch extends FileFun {
 		val dirArray = Array(prefetchDirectory)
 		val systemPrefetchFiles = getAllFiles(dirArray)
 		
-				// NEXT we need to import all of the prefetches from directory and compare their names to Strings in the safePrefetchList.
-				// We also need to write a regex to extract the prefetch fileNames without the hash values appended to them to use as
-				// a comparison.
-				// If one of the comparisons with the filenames with hashes extracted matches, the program should alert the user.
+		// NEXT we need to import all of the prefetches from directory and compare their names to Strings in the safePrefetchList.
+		// We also need to write a regex to extract the prefetch fileNames without the hash values appended to them to use as
+		// a comparison.
+		// If one of the comparisons with the filenames with hashes extracted matches, the program should alert the user.
 	
 	} // END main()
 } // END AnalyzePrefetch
