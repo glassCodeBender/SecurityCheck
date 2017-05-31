@@ -4,7 +4,7 @@ import scala.io.Source
 
 /**
 	* @Author: glassCodeBender
-	* @Date 5/30/2017
+	* @Date 5/31/2017
 	* @Version 1.0
 	*
 	* This program will look at a directory of prefetch files and determine inconsistencies.
@@ -31,22 +31,18 @@ object AnalyzePrefetch extends FileFun {
 
 		/*  import all of the prefetch files from a directory. */
 		val dirArray = Array(prefetchDirectory)
-		val systemPrefetchFiles = getAllFiles(dirArray) // how can we do this in parallel?
+		val systemPrefetchFiles = getAllFiles(dirArray).par
 
 		/* filter out the prefetch files that we have hash values for. */
-		val matchArray = systemPrefetchFiles.filter(x => safePrefetchArray.exists(y => x.contains(y)))
+		val matchArray = systemPrefetchFiles.filter(x => commonFiles.exists(y => x.contains(y)))
 
 		/* filter out the prefetch files that are not in the safePrefetchList */
 		val scaryFiles = matchArray.filter(x => safePrefetchArray.exists(y => x.contains(y)))
 
+		// Use the scaryFiles Array to determine which csv files need to be queried and appended to one another 
+		// for further assessment.
+		
 		scaryFiles.foreach(println)
-
-		// Should probably first filter out systemPrefetchFiles that match the commonFiles and put them in new Array.
-		// Then we should compare those files to the safePrefetchList array.
-		// NEXT we need to import all of the prefetches from directory and compare their names to Strings in the safePrefetchList.
-		// We also need to write a regex to extract the prefetch fileNames without the hash values appended to them to use as
-		// a comparison.
-		// If one of the comparisons with the filenames with hashes extracted matches, the program should alert the user.
-
+		
 	} // END main()
 } // END AnalyzePrefetch
