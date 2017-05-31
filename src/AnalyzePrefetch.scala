@@ -31,19 +31,18 @@ object AnalyzePrefetch extends FileFun {
 
 		/*  import all of the prefetch files from a directory. */
 		val dirArray = Array(prefetchDirectory)
-		val systemPrefetchFiles = getAllFiles(dirArray).par
+		val systemPrefetchFiles = getAllFiles(dirArray) // how can we do this in parallel?
 
 		/* filter out the prefetch files that we have hash values for. */
-		val matchArray = systemPrefetchFiles.filter(x => x.exists(_ == commonFiles))
+		val matchArray = systemPrefetchFiles.filter(x => safePrefetchArray.exists(y => x.contains(y)))
 
 		/* filter out the prefetch files that are not in the safePrefetchList */
-		val scaryFiles = matchArray.filter(x => x.exists(_ != safePrefetchArray))
-		
+		val scaryFiles = matchArray.filter(x => safePrefetchArray.exists(y => x.contains(y)))
+
 		scaryFiles.foreach(println)
 
 		// Should probably first filter out systemPrefetchFiles that match the commonFiles and put them in new Array.
 		// Then we should compare those files to the safePrefetchList array.
-
 		// NEXT we need to import all of the prefetches from directory and compare their names to Strings in the safePrefetchList.
 		// We also need to write a regex to extract the prefetch fileNames without the hash values appended to them to use as
 		// a comparison.
