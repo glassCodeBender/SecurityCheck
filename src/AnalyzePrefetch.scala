@@ -38,6 +38,8 @@ object AnalyzePrefetch extends FileFun {
 
 		/* filter out the prefetch files that are not in the safePrefetchList */
 		val scaryFiles = matchArray.filter(x => x.exists(_ != safePrefetchArray))
+		
+		scaryFiles.foreach(println)
 
 		// Should probably first filter out systemPrefetchFiles that match the commonFiles and put them in new Array.
 		// Then we should compare those files to the safePrefetchList array.
