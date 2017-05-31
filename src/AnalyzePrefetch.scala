@@ -8,7 +8,6 @@ import scala.io.Source
 	* @Version 1.0
 	*
 	* This program will look at a directory of prefetch files and determine inconsistencies.
-	*
 	* Note: The list of safe prefetch filenames was obtained here:
 	* http://www.hexacorn.com/blog/2012/06/13/prefetch-hash-calculator-a-hash-lookup-table-xpvistaw7w2k3w2k8/
 	*/
@@ -36,9 +35,9 @@ object AnalyzePrefetch extends FileFun {
 
 		/* filter out the prefetch files that we have hash values for. */
 		val matchArray = systemPrefetchFiles.filter(x => x.exists(_ == commonFiles))
-		
+
 		/* filter out the prefetch files that are not in the safePrefetchList */
-		val scaryFiles = matchArray.map(x => if (x.exists(_ != safePrefetchArray)) x)
+		val scaryFiles = matchArray.filter(x => x.exists(_ != safePrefetchArray))
 
 		// Should probably first filter out systemPrefetchFiles that match the commonFiles and put them in new Array.
 		// Then we should compare those files to the safePrefetchList array.
