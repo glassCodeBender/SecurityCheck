@@ -19,11 +19,13 @@ object AnalyzePrefetch extends FileFun {
 		val prefetchDirectory = "/Users/username/Documents/prefetchdir"   // stores prefetch directory location
 
 		/** Generate an Array made up of legitimate prefetch filenames.
-		  * An array is used because arrays are good for parallel processing. */
-		val prefFileName = {
-			Source.fromFile("/Users/username/Documents/security/prefetch_hashes_lookup.txt").getLines.toArray.par }
+			* An array is used because arrays are good for parallel processing. */
 		val reg = """[A-Z0-9]+.\w[-A-Z0-9]+.pf""".r
-		val safePrefetchArray = prefFileName.map(reg.findFirstIn(_).mkString).par
+		val safePrefetchArray = {
+			Source.fromFile("/Users/username/Documents/security/prefetch_hashes_lookup.txt")
+				.getLines
+				.toArray
+				.map(reg.findFirstIn(_).mkString).par}
 
 		/* Create an Array of made up of common system filenames. */
 		val otherReg = """[A-Z0-9.]+""".r
@@ -39,10 +41,10 @@ object AnalyzePrefetch extends FileFun {
 		/* filter out the prefetch files that are not in the safePrefetchList */
 		val scaryFiles = matchArray.filter(x => safePrefetchArray.exists(y => x.contains(y)))
 
-		// Use the scaryFiles Array to determine which csv files need to be queried and appended to one another 
+		// Use the scaryFiles Array to determine which csv files need to be queried and appended to one another
 		// for further assessment.
-		
+
 		scaryFiles.foreach(println)
-		
+
 	} // END main()
 } // END AnalyzePrefetch
