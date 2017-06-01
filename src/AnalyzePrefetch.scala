@@ -18,8 +18,7 @@ object AnalyzePrefetch extends FileFun {
 
 		val prefetchDirectory = "/Users/username/Documents/prefetchdir"   // stores prefetch directory location
 
-		/** Generate an Array made up of legitimate prefetch filenames.
-			* An array is used because arrays are good for parallel processing. */
+		/** Generate an Array made up of legitimate prefetch filenames.*/
 		val reg = """[A-Z0-9]+.\w[-A-Z0-9]+.pf""".r
 		val safePrefetchArray = {
 			Source.fromFile("/Users/username/Documents/security/prefetch_hashes_lookup.txt")
