@@ -3,6 +3,8 @@ package com.BigBrainSecurity
 import java.io.IOException
 import java.sql.Timestamp
 
+import org.apache.hadoop.yarn.webapp.hamlet.HamletSpec.SELECT
+import org.apache.spark.sql.functions.unix_timestamp
 import org.apache.spark.sql.SQLContext
 
 import scala.io.Source
@@ -45,7 +47,7 @@ object CleanMFT {
 		* This method does all the work.
 		* @param importFile String  File that contains the MFT table as a CSV.
 		* @param regexFile String   Text file we will use to get values to filter with.
-		* @param outputFile String  Name of the csv file we want to create.          
+		* @param outputFile String  Name of the csv file we want to create.
 		* @return Unit
 		* */
 	def run(importFile: String, // File that contains the MFT table as a CSV.
@@ -54,12 +56,13 @@ object CleanMFT {
 	       ): Unit = {
 
 		/* Create DataFrame and import MFT csv file. */
-		val sc = new SQLContext(sc)
+		val sqlContext = new SQLContext(sc)
 		// WARNING!!!
 		// PIPE SEPARATED VALUE.
 		// No concatenation to create timestamps.
 		/* import csv file and convert it into a DataFrame */
-		val df = sc.read.format("com.databricks.spark.csv")
+		val df = sqlContext.read.format("com.databricks.spark.csv")
+			.option("delimiter", "|" )
 			.option("header" = true)
 			.option("inferSchema", true)
 			.load(importFile)
@@ -74,12 +77,10 @@ object CleanMFT {
 		if(regexFile != None )
 			df = filterByFilename( df )
 		if(startDate != None || endDate != None || startTime != None || endTime != None) {
-			val start = ( startDate.mkString + " " + startTime.mkString )
-			val end = ( endDate.mkString + " " + endTime.mkString )
 			/*Create Start and Stop Timestamps for filtering */
-			val startStamp: Timestamp = new Timestamp().after(start)
-			val endStamp: Timestamp = new Timestamp().before(end)
-			df = filterByDate(df, startStamp, endStamp)
+			val timeStamp = makeTimeStamp(startDate.mkString, endDate.mkString, startTime.mkString, endTime.mkString )
+
+			df = filterByDate(sqlContext, startStamp, endStamp)
 		} // END if statement filter by date
 
 		df.saveAsSequenceFile("Users/Documents/MFT")
@@ -108,6 +109,19 @@ object CleanMFT {
 
 	} // END run()
 
+	def makeTimeStamp(startDate: String, // starting date
+	                  endDate: String, // end date
+	                  startTime: String, // start time
+	                  endTime: String  // end time
+	                 ) = {
+		val start = ( startDate.mkString + " " + startTime.mkString )
+		val end = ( endDate.mkString + " " + endTime.mkString )
+		/*Create Start and Stop Timestamps for filtering */
+		val startStamp: unix_timestamp(start)
+		val endStamp = unix_timestamp(end)
+		(startStamp, endStamp) // returns tuple with start and end timestamps
+	} // END makeTimeStamp()
+
 	/**
 		* indexFilter()
 		* Filters a DataFrame based on start and ending index locations.
@@ -132,7 +146,7 @@ object CleanMFT {
 	  */
 	def filterByFilename(df: DataFrame): DataFrame = {
     val pattern = updateReg(regexFile).r // contains regex pattern
-		// this probably needs to be opposite notContains() SEE API.
+		// this probably needs to be opposite notContains() SEE API.a
 		val filteredDF = df.filter(_.contains(pattern))
 		filteredDF
 
@@ -161,15 +175,16 @@ object CleanMFT {
 		* Filters a MFT csv file that was converted into a Dataframe to only include the
 		* occurrences of certain dates and/or times.
 		* @param df DataFrame
-		* @param sDate Timestamp
-		* @param eDate Timestamp
+		* @param sDate String
+		* @param eDate String
 		* @return DataFrame - Filtered to only include relevant virus names.
 		*/
-	def filterByDate(df: DataFrame,
-	                 sDate: Timestamp,
-	                 eDate: Timestamp
+	def filterByDate(sqlContext: SQLContext,
+	                 sDate: String,
+	                 eDate: String
 	                ): DataFrame = {
 
+		sqlContext.sql( SELECT )
 	} // END filterByDate()
 
 	/**
