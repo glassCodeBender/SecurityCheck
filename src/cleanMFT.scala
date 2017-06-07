@@ -6,10 +6,11 @@ import java.sql.Timestamp
 import org.apache.spark.sql.SQLContext
 
 import scala.io.Source
+import scala.util.matching.Regex
 
 /**
 	* @author: glassCodeBender
-	* @date: 2017-6-7
+	* @date: June 7, 2017
 	* @version: 1.0
 	*
 	*          Program Purpose: This program takes the cleanMFT.py
@@ -42,6 +43,9 @@ object CleanMFT {
 	/**
 		* run()
 		* This method does all the work.
+		* @param importFile String  File that contains the MFT table as a CSV.
+		* @param regexFile String   Text file we will use to get values to filter with.
+		* @param outputFile String  Name of the csv file we want to create.          
 		* @return Unit
 		* */
 	def run(importFile: String, // File that contains the MFT table as a CSV.
@@ -80,6 +84,8 @@ object CleanMFT {
 
 		df.saveAsSequenceFile("Users/Documents/MFT")
 		/* Filter DataFrame by Date*/
+
+
 		// if option to filter by index is true where do we get the index locations?
 		// probably a method.
 		/*
