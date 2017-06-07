@@ -51,17 +51,37 @@ object CleanMFT {
 	       ): Unit = {
 
 		/* Create DataFrame and import MFT csv file. */
-		val pd = new SQLContext(sc)
+		val sc = new SQLContext(sc)
 		// WARNING!!!
 		// PIPE SEPARATED VALUE.
 		// No concatenation to create timestamps.
 		/* import csv file and convert it into a DataFrame */
-		val df = pd.read.format("com.databricks.spark.csv")
+		val df = sc.read.format("com.databricks.spark.csv")
 			.option("header" = true)
 			.option("inferSchema", true)
 			.load(importFile)
-		// if option to filter by index is true where do we get the index locations?
-		// probably a method.
+
+		/* Filter DataFrame by index location */
+		if (startIndex != None || endIndex != None)
+			df = indexFilter(df, startIndex, endIndex )
+    /* Filter DataFrame to only include EXEs outside System32 or Program Files */
+		if(suspicious == true )
+			df = filterSuspicious(df)
+		/* Filter DataFrame by list of Strings (Regex) */
+		if(regexFile != None )
+			df = filterByFilename( df )
+		if(startDate != None || endDate != None || startTime != None || endTime != None) {
+			val start = ( startDate.mkString + " " + startTime.mkString )
+			val end = ( endDate.mkString + " " + endTime.mkString )
+			/*Create Start and Stop Timestamps for filtering */
+			val startStamp: Timestamp = new Timestamp().after(start)
+			val endStamp: Timestamp = new Timestamp().before(end)
+			df = filterByDate(df, startStamp, endStamp)
+		} // END if statement filter by date
+
+		df.saveAsSequenceFile("Users/Documents/MFT")
+		/* Filter DataFrame by Date*/
+
 		/*
         df = pd.DataFrame()
         df = df.from_csv(mft_csv, sep='|', parse_dates=[[0, 1]])
@@ -79,7 +99,6 @@ object CleanMFT {
             df = self.filter_by_dates(df)
         df.to_csv(output_file, index=True)
 		 */
-
 	} // END run()
 
 	/**
@@ -91,11 +110,11 @@ object CleanMFT {
 		* @return DataFrame
 		*/
 	def indexFilter(df: DataFrame, // Accepts a DataFrame.
-	                sIndex: Int,   // Contains Integer value that represents starting index.
-	                eIndex: Int    // Contains Integer value that represents the end index.
+	                sIndex: Int,   // Integer value that represents starting index.
+	                eIndex: Int    // Integer value that represents the end index.
 	               ): DataFrame = {
 
-	}
+	} // END indexFilter()
 
 	/**
 		* filterByFilename()
@@ -108,8 +127,7 @@ object CleanMFT {
 	def filterByFilename(df: DataFrame): DataFrame = {
 
 
-
-	}
+	} // END filterByFilename()
 
 	/**
 		* filterSuspicious()
@@ -124,8 +142,7 @@ object CleanMFT {
 		// matches all Strings that end with .exe
 		val regexExe = """.exe$""".r
 
-
-	}
+	} // END filterSuspicious()
 
 	/**
 		* Filters a MFT csv file that was converted into a Dataframe to only include the
@@ -140,15 +157,7 @@ object CleanMFT {
 	                 eDate: Timestamp
 	                ): DataFrame = {
 
-	}
-	/**
-		* readFile()
-		* This method was included in updateReg()
-		* Read a file line by line and return a list with items in each line.
-		* @param fileName: String
-		* @return List[String]
-		*/
-	def readFile(fileName: String): List[String] = {} // END readFile()
+	} // END filterByDate()
 
 	/**
 		* updateReg()
@@ -163,5 +172,4 @@ object CleanMFT {
 		val regexString = regArray.fold("")((first, second) => first + "|" + second )
 		return regexString.r
 	} // END updateReg()
-    
 } // END CleanMFT.scala
