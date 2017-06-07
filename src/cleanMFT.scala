@@ -6,11 +6,10 @@ import java.sql.Timestamp
 import org.apache.spark.sql.SQLContext
 
 import scala.io.Source
-import scala.util.matching.Regex
 
 /**
 	* @author: glassCodeBender
-	* @date: June 7, 2017
+	* @date: 2017-6-7
 	* @version: 1.0
 	*
 	*          Program Purpose: This program takes the cleanMFT.py
@@ -81,7 +80,8 @@ object CleanMFT {
 
 		df.saveAsSequenceFile("Users/Documents/MFT")
 		/* Filter DataFrame by Date*/
-
+		// if option to filter by index is true where do we get the index locations?
+		// probably a method.
 		/*
         df = pd.DataFrame()
         df = df.from_csv(mft_csv, sep='|', parse_dates=[[0, 1]])
@@ -99,6 +99,7 @@ object CleanMFT {
             df = self.filter_by_dates(df)
         df.to_csv(output_file, index=True)
 		 */
+
 	} // END run()
 
 	/**
@@ -121,11 +122,13 @@ object CleanMFT {
     * Filters a MFT csv file that was converted into a DataFrame to only include relevant extensions.
     * @param df DataFrame
     * @return DataFrame - Filter df to only include relevant file extensions.
-    * @forExample Turns a list into a regular expression.
     * @throws IOException explains why certain common behaviors occurs
 	  */
 	def filterByFilename(df: DataFrame): DataFrame = {
-
+    val pattern = updateReg(regexFile).r // contains regex pattern
+		// this probably needs to be opposite notContains() SEE API.
+		val filteredDF = df.filter(_.contains(pattern))
+		filteredDF
 
 	} // END filterByFilename()
 
@@ -137,14 +140,18 @@ object CleanMFT {
 		* @return DataFrame - Filtered to only include relevant file extensions.
     */
 	def filterSuspicious(df: DataFrame): DataFrame = {
-		// matches all Stringds that ran in Program Files or System32
+		// matches all Strings that ran in Program Files or System32
 		val regexSys32 = """^.+(Program\sFiles|System32).+[.exe]$""".r
-		// matches all Strings that end with .exe
-		val regexExe = """.exe$""".r
+		val regexExe = """.exe$""".r  // matches all Strings that end with .exe
 
+		val filterDF1 = df.filter(_.contains(regexSys32))
+		val filteredDF = filteredDF2.filter(_.contains(regexExe))
+
+		filteredDF
 	} // END filterSuspicious()
 
 	/**
+		* filterByDate()
 		* Filters a MFT csv file that was converted into a Dataframe to only include the
 		* occurrences of certain dates and/or times.
 		* @param df DataFrame
@@ -162,14 +169,15 @@ object CleanMFT {
 	/**
 		* updateReg()
 		* Filters a list of words and concatenate them into a regex.
-		* @param fileName made up of words provided by users to filter table with.
-		* @return Regex.
+		* @param fileName String made up of words provided by users to filter table with.
+		* @forExample Concatenates each line of a text file into a regular expression.
+		* @return Regex
 		*/
-	def updateReg(fileName: String): Regex = {
+	def updateReg(fileName: String): String = {
 		// import file - this can also be imported directly into a DataFrame
 		val regArray = Source.fromFile(fileName).getLines.toArray.map(_.trim).par
     // concatenate each member of the array to make String
 		val regexString = regArray.fold("")((first, second) => first + "|" + second )
-		return regexString.r
+		return regexString
 	} // END updateReg()
 } // END CleanMFT.scala
