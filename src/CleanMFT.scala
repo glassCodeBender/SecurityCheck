@@ -32,9 +32,9 @@ class CleanMFT {
 		val importFile: String = "/Users/mrsqueaksharem/Downloads/supers.csv"
 		val regexFile: String = "/Users/mrsqueaksharem/Downloads/files-to-filter.txt"
 		val outputFile = ""
-		
+
 		run(importFile, regexFile, outputFile)
-	}
+	} // END main()
 
 	/**
 		* run()
@@ -66,7 +66,7 @@ class CleanMFT {
 		val endDate = None             // Filter until this end date.
 		val startTime = None           // Filter from this start time
 		val endTime = None             // Filter until this end time.
-
+		
 
 		// WARNING!!!
 		// No concatenation to create timestamps.
@@ -113,7 +113,7 @@ class CleanMFT {
 			/*Create Start and Stop Timestamps for filtering */
 			val timeStamp = makeTimeStamp(startDate.mkString, endDate.mkString, startTime.mkString, endTime.mkString )
 
-			val dateDF = filterByDate(sqlContext, theDF , startStamp, endStamp)
+			val dateDF = filterByDate( theDF , timeStamp._1, timeStamp._2)
 		} // END if statement filter by date
 
 		/* Save the processed Data to a compressed file. */
