@@ -105,7 +105,7 @@ object CleanMFT {
 
 			val dateDF = filterByDate(sqlContext, theDF , startStamp, endStamp)
 		} // END if statement filter by date
-		
+
 		/* Save the processed Data to a compressed file. */
     if (dateDF != None) dateDF.saveAsSequenceFile("Users/lupefiascoisthebestrapper/Documents/MFT")
 		else theDF.saveAsSequenceFile("Users/lupefiascoisthebestrapper/Documents/MFT")
@@ -186,7 +186,7 @@ object CleanMFT {
 		val regexExe = """.exe$""".r  // matches all Strings that end with .exe
 
 		val filterDF1 = df.filter(_.contains(regexSys32))
-		val filteredDF = filteredDF2.filter(_.contains(regexExe))
+		val filteredDF = filteredDF1.filter(_.contains(regexExe))
 
 		filteredDF
 	} // END filterSuspicious()
