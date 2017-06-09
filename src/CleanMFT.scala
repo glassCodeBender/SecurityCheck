@@ -22,17 +22,19 @@ import scala.util.matching.Regex
 	*/
 
 class CleanMFT {
-
-	val importFile: String = "/Users/mrsqueaksharem/Downloads/supers.csv"
-	val regexFile: String = "/Users/mrsqueaksharem/Downloads/files-to-filter.txt"
-	val outputFile = ""
 	val sqlContext = new SQLContext(sc) // Create mothership.
 
 	/** main()
 		* Actual main method.
 		* @return Unit
 		*/
-	def main(args:Array[String]): Unit = run(importFile, regexFile, outputFile)
+	def main(args:Array[String]): Unit = {
+		val importFile: String = "/Users/mrsqueaksharem/Downloads/supers.csv"
+		val regexFile: String = "/Users/mrsqueaksharem/Downloads/files-to-filter.txt"
+		val outputFile = ""
+		
+		run(importFile, regexFile, outputFile)
+	}
 
 	/**
 		* run()
@@ -46,7 +48,7 @@ class CleanMFT {
 	        regexFile: String,  // Text file we will use to get values to filter with.
 	        outputFile: String  // Name of the csv file we want to create.
 	       ): Unit = {
-		
+
 		/* String FileNames of different user input values. */
 		val tableFile = importFile     // stores the csv file location
 		val filterForRFile = regexFile // stores the user created list file location.
@@ -58,7 +60,7 @@ class CleanMFT {
 		val endIndex = None            // Value of the field that user wants to stop filtering at.
 		val indexBool = true           // Does the user want toadd
 		val suspicious = false         // Filter any exe that ran outside of System32 or Program Files.
-		
+
 		/* These are used to create unix_timestamp objects. */
 		val startDate = None           // Filter from this start date.
 		val endDate = None             // Filter until this end date.
