@@ -151,11 +151,14 @@ object CleanMFT {
 		* @param eIndex End Index
 		* @return DataFrame
 		*/
-	def indexFilter(df: DataFrame, // Accepts a DataFrame.
+	def indexFilter(sqlContext: SQlContext,
+		               df: DataFrame, // Accepts a DataFrame.
 	                sIndex: Int,   // Integer value that represents starting index.
 	                eIndex: Int    // Integer value that represents the end index.
 	               ): DataFrame = {
 
+		// DO SQL
+		
 	} // END indexFilter()
 
 	/**
@@ -208,7 +211,7 @@ object CleanMFT {
 
 		val dateDF = sqlContext.sql( SELECT *
 			                           WHERE $Date_Time >= sDate AND $Date_Time =< $eDate )
-		dateDF 
+		dateDF
 	} // END filterByDate()
 
 	/**
