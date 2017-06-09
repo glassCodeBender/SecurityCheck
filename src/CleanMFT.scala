@@ -201,12 +201,14 @@ object CleanMFT {
 		* @return DataFrame - Filtered to only include relevant virus names.
 		*/
 	def filterByDate(sqlContext: SQLContext,
-	                df: DataFrame,
-	                 sDate: String,
-	                 eDate: String
+	                 df: DataFrame,
+	                 sDate: unix_timestamp,
+	                 eDate: unix_timestamp
 	                ): DataFrame = {
 
-		sqlContext.sql( SELECT )
+		val dateDF = sqlContext.sql( SELECT *
+			                           WHERE $Date_Time >= sDate AND $Date_Time =< $eDate )
+		dateDF 
 	} // END filterByDate()
 
 	/**
