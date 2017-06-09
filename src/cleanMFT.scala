@@ -28,7 +28,7 @@ object CleanMFT {
 	val filterIndex = false
 	val startIndex = None
 	val endIndex = None
-	val outputFile = None
+	val outputFile = ""
 	val indexBool = true
 	val suspicious = false
 	val startDate = None
@@ -65,7 +65,7 @@ object CleanMFT {
 			.option("delimiter", "|" )
 			.option("header" = true)
 			.option("inferSchema", true)
-			.load(importFile)
+			.load(importFile).persist()
 
 		/* Filter DataFrame by index location */
 		if (startIndex != None || endIndex != None)
@@ -73,14 +73,16 @@ object CleanMFT {
 
 		/* Filter DataFrame to only include EXEs outside System32 or Program Files */
 		if(suspicious == true )
-			val suspiciousDF = filterSuspicious(if (indexDF != None) filterSuspicious(indexDF) else filterSuspicious(df))
+			val suspiciousDF = filterSuspicious(
+				if (indexDF != None) filterSuspicious(indexDF)
+				else filterSuspicious(df))
 
 		/* Filter DataFrame by list of Strings (Regex) */
-		if(regexFile != None ){
-			val regDF = {
-				if ( suspiciousDF != None ) filterByFilename ( suspiciousDF )
-				else if ( indexDF != None ) indexDF
-				else df
+		if(!regexFile.isEmpty ){
+			val regDF = df match{
+				case ( suspiciousDF != None ) => filterByFilename ( suspiciousDF )
+				case ( indexDF != None ) => indexDF
+				case df => df
 			}
 		} // END if regexFile
 
@@ -89,44 +91,30 @@ object CleanMFT {
 			* @return DataFrame
 			*/
 		val theDF: DataFrame = df match {
-			case regDF != None => regDF
+			case ( regDF != None ) => regDF
 				case suspiciousDF != None => suspiciousDF
 				case indexDF != None => indexDF
 				case df != None => df
-		} // END theDF()
+		} // END theDF
 
 		/* Take user input and convert it into a timestamp(s) */
 		if(startDate != None || endDate != None || startTime != None || endTime != None) {
 
-				/*Create Start and Stop Timestamps for filtering */
+			/*Create Start and Stop Timestamps for filtering */
 			val timeStamp = makeTimeStamp(startDate.mkString, endDate.mkString, startTime.mkString, endTime.mkString )
 
 			val dateDF = filterByDate(sqlContext, theDF , startStamp, endStamp)
 		} // END if statement filter by date
+		
+		/* Save the processed Data to a compressed file. */
+    if (dateDF != None) dateDF.saveAsSequenceFile("Users/lupefiascoisthebestrapper/Documents/MFT")
+		else theDF.saveAsSequenceFile("Users/lupefiascoisthebestrapper/Documents/MFT")
 
-		df.saveAsSequenceFile("Users/Documents/MFT")
 		/* Filter DataFrame by Date*/
 
 
 		// if option to filter by index is true where do we get the index locations?
 		// probably a method.
-		/*
-        df = pd.DataFrame()
-        df = df.from_csv(mft_csv, sep='|', parse_dates=[[0, 1]])
-        # df = df.from_csv("MftDump_2015-10-29_01-27-48.csv", sep='|')
-        # df_attack_date = df[df.index == '2013-12-03'] # Creates an extra df for the sake of reference
-        if index_bool:
-            df.reset_index(level=0, inplace=True)
-            if sindex and eindex:
-                df = df[sindex : eindex]
-        if reg_file:
-            df = self.filter_by_filename(df)
-        if suspicious:
-            df = self.filter_suspicious(df)
-        if sdate or edate or stime or etime:
-            df = self.filter_by_dates(df)
-        df.to_csv(output_file, index=True)
-		 */
 
 	} // END run()
 	/********************************END OF THE DRIVER PROGRAM**********************************/
