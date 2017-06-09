@@ -21,20 +21,12 @@ import scala.util.matching.Regex
 	*          environments with Apache Spark.
 	*/
 
-object CleanMFT {
+class CleanMFT {
 
 	val importFile: String = "/Users/mrsqueaksharem/Downloads/supers.csv"
 	val regexFile: String = "/Users/mrsqueaksharem/Downloads/files-to-filter.txt"
-	val filterIndex = false
-	val startIndex = None
-	val endIndex = None
 	val outputFile = ""
-	val indexBool = true
-	val suspicious = false
-	val startDate = None
-	val endDate = None
-	val startTime = None
-	val endTime = None
+	val sqlContext = new SQLContext(sc) // Create mothership.
 
 	/** main()
 		* Actual main method.
@@ -54,9 +46,25 @@ object CleanMFT {
 	        regexFile: String,  // Text file we will use to get values to filter with.
 	        outputFile: String  // Name of the csv file we want to create.
 	       ): Unit = {
+		
+		/* String FileNames of different user input values. */
+		val tableFile = importFile     // stores the csv file location
+		val filterForRFile = regexFile // stores the user created list file location.
+		val destFileName = outputFile  // stores the name the user wants to use for the destination file.
 
-		/* Create DataFrame and import MFT csv file. */
-		val sqlContext = new SQLContext(sc)
+		/* Booleans to determine how the table should be filtered. */
+		val filterIndex = false        // Filter the index for some reason?
+		val startIndex = None          // Value of the field that user wants to start filtering from.
+		val endIndex = None            // Value of the field that user wants to stop filtering at.
+		val indexBool = true           // Does the user want toadd
+		val suspicious = false         // Filter any exe that ran outside of System32 or Program Files.
+		
+		/* These are used to create unix_timestamp objects. */
+		val startDate = None           // Filter from this start date.
+		val endDate = None             // Filter until this end date.
+		val startTime = None           // Filter from this start time
+		val endTime = None             // Filter until this end time.
+
 
 		// WARNING!!!
 		// No concatenation to create timestamps.
@@ -151,14 +159,13 @@ object CleanMFT {
 		* @param eIndex End Index
 		* @return DataFrame
 		*/
-	def indexFilter(sqlContext: SQlContext,
-		               df: DataFrame, // Accepts a DataFrame.
+	def indexFilter( df: DataFrame, // Accepts a DataFrame.
 	                sIndex: Int,   // Integer value that represents starting index.
 	                eIndex: Int    // Integer value that represents the end index.
 	               ): DataFrame = {
 
 		// DO SQL
-		
+
 	} // END indexFilter()
 
 	/**
@@ -203,10 +210,9 @@ object CleanMFT {
 		* @param eDate String
 		* @return DataFrame - Filtered to only include relevant virus names.
 		*/
-	def filterByDate(sqlContext: SQLContext,
-	                 df: DataFrame,
-	                 sDate: unix_timestamp,
-	                 eDate: unix_timestamp
+	def filterByDate( df: DataFrame,
+	                  sDate: unix_timestamp,
+	                  eDate: unix_timestamp
 	                ): DataFrame = {
 
 		val dateDF = sqlContext.sql( SELECT *
