@@ -30,9 +30,9 @@ class CleanMFT(val sqlContext: SQLContext,
 	val spark = sqlContext
 
 	/* Stores all the file locations the program uses. */
-	val importFile: String = iFile // The fully qualified file name for the MFT Dump CSV.
-	val regexFile: String = regFile // A text file with different items on each line to use for filter.
-	val outputFile = oFile // What should the csv file that is generated be named?
+	private val importFile: String = iFile // The fully qualified file name for the MFT Dump CSV.
+	private val regexFile: String = regFile // A text file with different items on each line to use for filter.
+	private val outputFile: String = oFile // What should the csv file that is generated be named?
 
 	/**
 		* run()
@@ -87,7 +87,11 @@ class CleanMFT(val sqlContext: SQLContext,
 			}
 		} // END if regexFile
 
-		/* Stores the current state of the DataFrame */
+		/**
+			* Stores the current state of the DataFrame
+			*
+			* @return DataFrame
+			*/
 		val theDF: DataFrame = {
 			if ( regDF != None ) regDF
 			else if ( suspiciousDF != None ) suspiciousDF
@@ -166,9 +170,11 @@ class CleanMFT(val sqlContext: SQLContext,
 		* @return DataFrame - Filter df to only include relevant file extensions.
 		* @throws IOException explains why certain common behaviors occurs
 		*/
+	// THIS PROBABLY NEEDS TO BE THE OPPOSITE
+	// WE NEED 2 FUNCTIONS: filterKEEP AND filterREMOVE.
 	def filterByFilename ( df: DataFrame ): DataFrame = {
-		val pattern = updateReg ( regexFile ).r // contains regex pattern
-		// this probably needs to be opposite notContains() SEE API.
+		// Regex is WHAT TO INCLUDE after transformation!!!!
+		val pattern = updateReg ( regexFile ).r // String pattern => Regex
 		val filteredDF = df.filter ( _.contains ( pattern ) )
 		filteredDF
 
@@ -188,8 +194,8 @@ class CleanMFT(val sqlContext: SQLContext,
 			"""^.+(Program\sFiles|System32).+[.exe]$""".r
 		val regexExe = """.exe$""".r // matches all Strings that end with .exe
 
-		val filterDF1 = df.filter ( _.contains ( regexSys32 ) )
-		val filteredDF = filteredDF1.filter ( _.contains ( regexExe ) )
+		val filterDF1 = df.filter ( !$"Desc".contains ( regexSys32 ) )
+		val filteredDF = filteredDF1.filter ( $"Desc".contains ( regexExe ) )
 
 		filteredDF
 	} // END filterSuspicious()
@@ -229,5 +235,5 @@ class CleanMFT(val sqlContext: SQLContext,
 		val regexString = regArray.fold ( "" )( ( first, second ) => first + "|" + second )
 		return regexString
 	} // END updateReg()
-  
+	
 } // END CleanMFT.scala
