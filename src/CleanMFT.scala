@@ -37,16 +37,9 @@ class CleanMFT(val sqlContext: SQLContext,
 	/**
 		* run()
 		* This method does all the work.
-		*
-		* @param importFile String  File that contains the MFT table as a CSV.
-		* @param regexFile  String   Text file we will use to get values to filter with.
-		* @param outputFile String  Name of the csv file we want to create.
 		* @return Unit
 		**/
-	def run ( importFile: String, // File that contains the MFT table as a CSV.
-	          regexFile: String, // Text file we will use to get values to filter with.
-	          outputFile: String // Name of the csv file we want to create.
-	        ): Unit = {
+	def run (): Unit = {
 
 		/* String Filenames of different user input values. */
 		val tableFile = importFile // stores the csv file location
@@ -73,7 +66,7 @@ class CleanMFT(val sqlContext: SQLContext,
 			.option ( "delimiter", "|" )
 			.option ( "header" = true )
 			.option ( "inferSchema", true )
-			.load ( importFile ).persist ( )
+			.load ( importFile ).cache ( )
 
 		/* Filter DataFrame by index location */
 		if ( startIndex != None || endIndex != None )
@@ -94,11 +87,7 @@ class CleanMFT(val sqlContext: SQLContext,
 			}
 		} // END if regexFile
 
-		/**
-			* Stores the current state of the DataFrame
-			*
-			* @return DataFrame
-			*/
+		/* Stores the current state of the DataFrame */
 		val theDF: DataFrame = {
 			if ( regDF != None ) regDF
 			else if ( suspiciousDF != None ) suspiciousDF
@@ -240,128 +229,5 @@ class CleanMFT(val sqlContext: SQLContext,
 		val regexString = regArray.fold ( "" )( ( first, second ) => first + "|" + second )
 		return regexString
 	} // END updateReg()
+  
 } // END CleanMFT.scala
-
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*************************** THIS IS THE END OF THE PROGRAM ******************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*****************************************************************************************/
-	/*
-
-    """ This is the main method of the program. """
-    def run(self):
-        sdate, edate, stime, etime = self.__start_date, self.__end_date, self.__start_time, self.__end_time
-        output_file = self.__output_file
-        suspicious = self.__suspicious
-        mft_csv = self.__file
-        reg_file = self.__reg_file
-        index_bool = self.__index_bool
-
-        sindex, eindex = [x.strip() for x in self.__filter_index.split(',')]
-        if sindex.contains(',') or eindex.contains(','):
-            sindex.replace(',', '')
-            eindex.replace(',', '')
-        if not sindex.isdigit and eindex.isdigit:
-            raise ValueError("ERROR: The index value you entered to filter the table by was improperly formatted. \n"
-                             "Please try to run the program again with different values.")
-        df = pd.DataFrame()
-        df = df.from_csv(mft_csv, sep='|', parse_dates=[[0, 1]])
-        # df = df.from_csv("MftDump_2015-10-29_01-27-48.csv", sep='|')
-        # df_attack_date = df[df.index == '2013-12-03'] # Creates an extra df for the sake of reference
-        if index_bool:
-            df.reset_index(level=0, inplace=True)
-            if sindex and eindex:
-                df = df[sindex : eindex]
-        if reg_file:
-            df = self.filter_by_filename(df)
-        if suspicious:
-            df = self.filter_suspicious(df)
-        if sdate or edate or stime or etime:
-            df = self.filter_by_dates(df)
-        df.to_csv(output_file, index=True)
-
-    """
-    Read a file line by line and return a list with items in each line.
-    @Param A Filename
-    @Return A list
-    """
-    def read_file(self, file):
-        list = []
-        with open(file) as f:
-            for line in f:
-                list.append(line)
-        return list
-
-    """
-    Method to filter a list of words and concatenate them into a regex
-    @Param List of words provided by user to alternative file.
-    @Return String that will be concatenated to a regex.
-    """
-    def update_reg(self, list):
-        s = '|'
-        new_reg = s.join(list)
-        return new_reg
-
-    """
-    Filters a MFT csv file that was converted into a DataFrame to only include relevant extensions.
-    @Param: DataFrame
-    @Return: DataFrame - Filtered to only include relevant file extensions.
-    """
-    def filter_by_filename(self, df):
-        reg_file = self.__reg_file
-        reg_list = self.read_file(reg_file)
-        user_reg = self.update_reg(reg_list)
-
-        if user_reg is not None:
-            pattern = r'' + user_reg
-        else:
-            pattern = r'.exe|.dll|.rar|.sys|.jar'
-
-        regex1 = re.compile(pattern, flags=re.IGNORECASE)
-        df['mask'] = df[['Filename', 'Desc']].apply(lambda x: x.str.contains(regex1, regex=True)).any(axis=1)
-        filt_df = df[df['mask'] == True]
-
-        pattern2 = r'Create$|Entry$'
-        regex2 = re.compile(pattern2, flags=re.IGNORECASE)
-        filt_df['mask2'] = filt_df[['Type']].apply(lambda x: x.str.contains(regex2, regex=True)).any(axis=1)
-        filtered_df = filt_df[filt_df['mask2'] == True]
-        filtered_df.drop(['mask', 'mask2'], axis=1, inplace=True)
-
-        return filtered_df
-
-    """
-    Filters a MFT so that only the executables that were run outside Program Files are
-    included in the table.
-    @Param: DataFrame
-    @Return: DataFrame - Filtered to only include relevant file extensions.
-    """
-    def filter_suspicious(self, df):
-        pattern = r'^.+(Program\sFiles|System32).+[.exe]$'
-        regex1 = re.compile(pattern)
-        df['mask'] = df[['Filename', 'Desc']].apply(lambda x: x.str.contains(regex1, regex=True)).any(axis=1)
-        filt_df = df[df['mask'] == False]
-
-        pattern2 = r'.exe$'
-        regex2 = re.compile(pattern2)
-        filt_df['mask2'] = filt_df[['Filename', 'Desc']].apply(lambda x: x.str.contains(regex2, regex=True)).any(axis=1)
-        filtered_df = filt_df[filt_df['mask2'] == True]
-        filtered_df.drop(['mask', 'mask2'], axis=1, inplace=True)
-        return filtered_df
