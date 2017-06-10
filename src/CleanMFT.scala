@@ -26,7 +26,10 @@ class CleanMFT(val sqlContext: SQLContext,
                val oFile: String ){
 
 	/* Read pre-written config file */
-	val config = Source.fromFile("Users/CodeStalkersRUS/Documents/ConfigFileStorage/config.txt").getLines.toArray.map(_.contains("#"))
+	val config = Source.fromFile("Users/CodeStalkersRUS/Documents/ConfigFileStorage/config.txt")
+		.getLines
+		.toArray
+		.filter(_.contains("#"))
 
 	/* Class will accept a SQLContext through it's constructor */
 	val spark = sqlContext
@@ -89,11 +92,7 @@ class CleanMFT(val sqlContext: SQLContext,
 			}
 		} // END if regexFile
 
-		/**
-			* Stores the current state of the DataFrame
-			*
-			* @return DataFrame
-			*/
+		/* Stores the current state of the DataFrame */
 		val theDF: DataFrame = {
 			if ( regDF != None ) regDF
 			else if ( suspiciousDF != None ) suspiciousDF
@@ -142,7 +141,7 @@ class CleanMFT(val sqlContext: SQLContext,
 		/*Create Start and Stop Timestamps for filtering */
 		val startStamp: unix_timestamp = start
 		val endStamp: unix_timestamp = end
-		(startStamp, endStamp) // returns tuple with start and end timestamps
+		return (startStamp, endStamp) // returns tuple with start and end timestamps
 
 	} // END makeTimeStamp()
 
@@ -163,7 +162,7 @@ class CleanMFT(val sqlContext: SQLContext,
 		df.registerTempTable("DataFrame")
 
 		val indexDF = spark.sql ( SELECT * FROM DataFrame)
-		indexDF
+		return indexDF
 		// DO SQL
 
 	} // END indexFilter()
@@ -181,8 +180,8 @@ class CleanMFT(val sqlContext: SQLContext,
 	def filterByFilename ( df: DataFrame ): DataFrame = {
 		// Regex is WHAT TO INCLUDE after transformation!!!!
 		val pattern = updateReg ( regexFile ).r // String pattern => Regex
-		val filteredDF = df.filter ( _.contains ( pattern ) )
-		filteredDF
+		val filteredDF = df.map ( pattern.findAllIn($"Desc") )
+		return filteredDF
 
 	} // END filterByFilename()
 
@@ -200,10 +199,11 @@ class CleanMFT(val sqlContext: SQLContext,
 			"""^.+(Program\sFiles|System32).+[.exe]$""".r
 		val regexExe = """.exe$""".r // matches all Strings that end with .exe
 
-		val filterDF1 = df.filter ( !$"Desc".contains ( regexSys32 ) )
-		val filteredDF = filteredDF1.filter ( $"Desc".contains ( regexExe ) )
-
-		filteredDF
+		// val filteredDF = df.map ( pattern.findAllIn($"Desc") )
+		
+		val filterDF1 = df.map ( regexSys32.findAllIn($"Desc") ) 
+		val filteredDF = filterDF1.map(regexExe.findAllIn($"Desc" || $"File" ))
+		return filteredDF
 	} // END filterSuspicious()
 
 	/**
@@ -223,9 +223,9 @@ class CleanMFT(val sqlContext: SQLContext,
 
 		df.registerTempTable("DataFrame")
 
-		val dateDF = spark.sql ( SELECT * FROM DataFrame 
+		val dateDF = spark.sql ( SELECT * FROM DataFrame
 			WHERE $Date_Time >= sDate AND $Date_Time =< eDate )
-		dateDF
+		return dateDF
 	} // END filterByDate()
 
 	/**
