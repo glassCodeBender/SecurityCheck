@@ -6,24 +6,25 @@ import scala.io.Source
 	* @author glassCodeBender
 	* @date 2017-June-10
 	* @version 1.0
-	*          
+	*
 	*          Program Purpose: A utility program used to configure the Intrusion Detection System (IDS) setting.
+	*          This program will be used by many BigBrainSecurity classes.
 	*/
 trait SetupProgram {
 
 	/* Read pre-written config file from disk */
 	val CONFIG = Source.fromFile("Users/CodeStalkersRUS/Documents/ConfigFileStorage/config.txt").getLines.toArray.map(!_.contains("#"))
-	
+
 	def setup(): ={
-		val configArray = CONFIG 
-		
+		val configArray = CONFIG
+
 		// Need to do a split and take two sides into a map.
-		
+
 	} // END setup()
-	/* 
+	/*
 	* What should be configured?
 	* Everything but file locations.
-	* 
+	*
 	* 1. Operating System Version
 	* 2. Booleans to determine how the table should be filtered.
 	* 3. Custom Regex?
@@ -32,12 +33,11 @@ trait SetupProgram {
 	* val endIndex = None // Value of the field that user wants to stop filtering at.
 	* val indexBool = true // Does the user want toadd
 	* val suspicious = false // Filter any exe that ran outside of System32 or Program Files.
-	* 
+	*
 	* val startDate = None // Filter from this start date.
 	* val endDate = None // Filter until this end date
 	* val startTime = None // Filter from this start time
 	* val endTime = None // Filter until this end time.
 	* */
-
 
 } // END SetupProgram trait
