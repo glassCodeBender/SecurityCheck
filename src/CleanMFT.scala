@@ -29,7 +29,7 @@ class CleanMFT(val sqlContext: SQLContext,
 	val config = Source.fromFile("Users/CodeStalkersRUS/Documents/ConfigFileStorage/config.txt")
 		.getLines
 		.toArray
-		.filter(_.contains("#"))
+		.filterNot(_.contains("#"))
 
 	/* Class will accept a SQLContext through it's constructor */
 	val spark = sqlContext
@@ -200,8 +200,8 @@ class CleanMFT(val sqlContext: SQLContext,
 		val regexExe = """.exe$""".r // matches all Strings that end with .exe
 
 		// val filteredDF = df.map ( pattern.findAllIn($"Desc") )
-		
-		val filterDF1 = df.map ( regexSys32.findAllIn($"Desc") ) 
+
+		val filterDF1 = df.map ( regexSys32.findAllIn($"Desc") )
 		val filteredDF = filterDF1.map(regexExe.findAllIn($"Desc" || $"File" ))
 		return filteredDF
 	} // END filterSuspicious()
