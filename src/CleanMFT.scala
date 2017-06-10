@@ -49,7 +49,7 @@ class CleanMFT {
 	        outputFile: String  // Name of the csv file we want to create.
 	       ): Unit = {
 
-		/* String FileNames of different user input values. */
+		/* String Filenames of different user input values. */
 		val tableFile = importFile     // stores the csv file location
 		val filterForRFile = regexFile // stores the user created list file location.
 		val destFileName = outputFile  // stores the name the user wants to use for the destination file.
@@ -66,7 +66,7 @@ class CleanMFT {
 		val endDate = None             // Filter until this end date.
 		val startTime = None           // Filter from this start time
 		val endTime = None             // Filter until this end time.
-		
+
 
 		// WARNING!!!
 		// No concatenation to create timestamps.
@@ -89,10 +89,10 @@ class CleanMFT {
 
 		/* Filter DataFrame by list of Strings (Regex) */
 		if(!regexFile.isEmpty ){
-			val regDF = df match{
-				case ( suspiciousDF != None ) => filterByFilename ( suspiciousDF )
-				case ( indexDF != None ) => indexDF
-				case df => df
+			val regDF = {
+				if ( suspiciousDF != None ) filterByFilename ( suspiciousDF )
+				else if ( indexDF != None ) => indexDF
+				else => df
 			}
 		} // END if regexFile
 
@@ -100,11 +100,11 @@ class CleanMFT {
 			* Stores the current state of the DataFrame
 			* @return DataFrame
 			*/
-		val theDF: DataFrame = df match {
-			case ( regDF != None ) => regDF
-				case suspiciousDF != None => suspiciousDF
-				case indexDF != None => indexDF
-				case df != None => df
+		val theDF: DataFrame = {
+			if ( regDF != None ) regDF
+				else if (suspiciousDF != None) suspiciousDF
+				else if (indexDF != None) indexDF
+				else df
 		} // END theDF
 
 		/* Take user input and convert it into a timestamp(s) */
