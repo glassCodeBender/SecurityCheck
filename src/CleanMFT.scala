@@ -8,7 +8,6 @@ import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.functions._ // needed to do a lot of things (unix_timestamp)
 
 import scala.io.Source
-import scala.util.matching.Regex
 
 /**
 	* @author: glassCodeBender
@@ -25,6 +24,9 @@ class CleanMFT(val sqlContext: SQLContext,
                val iFile: String,
                val regFile: String,
                val oFile: String ){
+
+	/* Read pre-written config file */
+	val config = Source.fromFile("Users/CodeStalkersRUS/Documents/ConfigFileStorage/config.txt").getLines.toArray.map(_.contains("#"))
 
 	/* Class will accept a SQLContext through it's constructor */
 	val spark = sqlContext
@@ -158,6 +160,10 @@ class CleanMFT(val sqlContext: SQLContext,
 	                  eIndex: Int // Integer value that represents the end index.
 	                ): DataFrame = {
 
+		df.registerTempTable("DataFrame")
+
+		val indexDF = spark.sql ( SELECT * FROM DataFrame)
+		indexDF
 		// DO SQL
 
 	} // END indexFilter()
@@ -215,8 +221,10 @@ class CleanMFT(val sqlContext: SQLContext,
 	                   eDate: unix_timestamp
 	                 ): DataFrame = {
 
-		val dateDF = spark.sql ( SELECT *
-			WHERE $Date_Time >= sDate AND $Date_Time =< $eDate )
+		df.registerTempTable("DataFrame")
+
+		val dateDF = spark.sql ( SELECT * FROM DataFrame 
+			WHERE $Date_Time >= sDate AND $Date_Time =< eDate )
 		dateDF
 	} // END filterByDate()
 
@@ -235,5 +243,5 @@ class CleanMFT(val sqlContext: SQLContext,
 		val regexString = regArray.fold ( "" )( ( first, second ) => first + "|" + second )
 		return regexString
 	} // END updateReg()
-	
+
 } // END CleanMFT.scala
